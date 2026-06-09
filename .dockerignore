@@ -1,0 +1,31 @@
+# Keep the build context small and avoid copying host-specific files into the image.
+
+# renv: the local library is Windows-specific and must NOT go into the Linux image;
+# renv::restore() rebuilds it inside the container from renv.lock.
+renv/library/
+renv/staging/
+renv/python/
+renv/sandbox/
+
+# RStudio / R session cruft
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Renviron
+
+# Version control
+.git/
+.gitignore
+
+# Generated output (rebuilt inside the container)
+Output/
+*.log
+*.aux
+
+# Reference material not needed for the build
+Papers/
+
+# OS files
+.DS_Store
+Thumbs.db
