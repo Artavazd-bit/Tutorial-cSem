@@ -213,22 +213,52 @@ Section
 
 
 \section{cSEM R package Illustration}
-To use the cSEM package users need to install R and an IDE, i.e. R-Studio.
-We refer to the installation guide on the official website of R.
+This section illustrates how to apply PLSc using the \pkg{cSEM} package, starting
+from the very first steps. It assumes no prior experience with \textsf{R}; readers
+already familiar with \textsf{R} and \textsf{RStudio} may skip directly to
+Section~\ref{sec:model-data}.
 
-When opening RStudio for the first time the user is shown four panes. 
-The Console pane lower left, where the code runs, the script editor upper left, where you input your code, the environment panes on the right hand side. 
+To use the \pkg{cSEM} package, users first need to install \textsf{R} and an
+integrated development environment (IDE) such as \textsf{RStudio}. For the
+installation, we refer to the official guides for \textsf{R}
+(\url{https://cran.r-project.org}) and \textsf{RStudio}
+(\url{https://posit.co/download/rstudio-desktop}).
 
-First we need to create a new Rscript File, for this click on File -> New File -> R Script. 
-The workflow is as follows: You write code and then run the lines with ctrl + enter.
-When you want to write a comment use # in the beginning of the so the code does not run this line of code. 
+When \textsf{RStudio} is opened for the first time, it displays four panes
+(Figure~\ref{fig:rstudio}). The two most important ones are the \emph{script
+editor} (upper left), where code is written and saved, and the \emph{Console}
+(lower left), where the code is executed and results are printed. The
+\emph{Environment} pane (upper right) lists the objects currently loaded into
+memory, and the fourth pane (lower right) provides access to files, plots, and
+help pages.
 
-To work with the package cSEM you need to install it first. 
-The cSEM package is available on CRAN, thus the most recent stable version can be installed as followd:
+Although code can be typed directly into the Console, it is good practice to
+work in a script, since a script can be saved, shared, and re-run, which is
+essential for reproducible analyses. To create a new script, click
+\textsf{File~$\rightarrow$ New File~$\rightarrow$ R Script}. The typical workflow
+is to write code in the editor and run the selected line(s) with
+\texttt{Ctrl~+~Enter}. Any line beginning with \texttt{\#} is treated as a
+comment: it documents what the code does and is ignored when the code runs.
+
+\begin{lstlisting}
+# This is a comment and is not executed.
+1 + 1   # Code is executed; the result is printed in the Console.
+\end{lstlisting}
+
+Before \pkg{cSEM} can be used, it must be installed. The \pkg{cSEM} package is
+available on CRAN, so the most recent stable version can be installed with:
 \begin{lstlisting}
 install.packages("cSEM")
 \end{lstlisting}
-This only needs to be done once, to update the package rerun this line. 
+Installation only needs to be done once per machine (rerun this line to update
+the package later). After installation, the package must be loaded at the start
+of every new \textsf{R} session before its functions become available:
+\begin{lstlisting}
+library(cSEM)
+\end{lstlisting}
+With \pkg{cSEM} installed and loaded, we can now import the data and specify the
+model, as described in the following sections.
+
 
 
 
