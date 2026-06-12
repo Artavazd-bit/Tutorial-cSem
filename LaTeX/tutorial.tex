@@ -211,6 +211,29 @@ Section
 % model assessment, concluding with a brief comparison of PLSc-SEM and standard
 % PLS-SEM estimates.
 
+
+\section{cSEM R package Illustration}
+To use the cSEM package users need to install R and an IDE, i.e. R-Studio.
+We refer to the installation guide on the official website of R.
+
+When opening RStudio for the first time the user is shown four panes. 
+The Console pane lower left, where the code runs, the script editor upper left, where you input your code, the environment panes on the right hand side. 
+
+First we need to create a new Rscript File, for this click on File -> New File -> R Script. 
+The workflow is as follows: You write code and then run the lines with ctrl + enter.
+When you want to write a comment use # in the beginning of the so the code does not run this line of code. 
+
+To work with the package cSEM you need to install it first. 
+The cSEM package is available on CRAN, thus the most recent stable version can be installed as followd:
+\begin{lstlisting}
+install.packages("cSEM")
+\end{lstlisting}
+This only needs to be done once, to update the package rerun this line. 
+
+
+
+
+
 \section*{The cSEM R package}
 
 The \pkg{cSEM} package \citep{csem} offers a variety of composite-based approaches to SEM including PLS-PM and PLSc.
@@ -242,7 +265,7 @@ Additional postestimation functions include \fn{assess()} for measurement and st
 
 \subsection{Model and Data}
 
-Following \citet{Cheah2026}, our illustration draws on the employee retention model introduced by \citet[Chapter~13]{Hair2019c}. 
+Following \citet{Cheah2026}, our illustration draws on the employee retention model introduced by \citet[Chapter~13]{Hair2019c}.
 The model explains the effects of organizational commitment~(OC) and job satisfaction~(JS) on employees' staying intentions~(SI), with work environment perceptions~(EP) and attitudes toward coworkers~(AC) as exogenous antecedent constructs. 
 Five constructs are reflectively measured by a total of 21 indicators. 
 A detailed description of the indicators can be found in \citet{Cheah2026}.
