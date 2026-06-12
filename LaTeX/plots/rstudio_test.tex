@@ -1,0 +1,135 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[ansinew]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc,fit,shapes.geometric}
+
+\begin{document}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[font=\sffamily]
+% ---- colors ----
+\definecolor{rsbar}{HTML}{3B4252}      % dark toolbar
+\definecolor{rsmenu}{HTML}{F2F2F2}     % menu bar
+\definecolor{rstab}{HTML}{E8E8E8}      % tab strip
+\definecolor{rspane}{HTML}{FFFFFF}     % pane body
+\definecolor{rsborder}{HTML}{BFBFBF}   % borders
+\definecolor{rsaccent}{HTML}{4C8DBE}   % active tab accent (blue)
+\definecolor{rsprompt}{HTML}{1A7D1A}   % console green prompt
+\definecolor{rscomment}{HTML}{9A9A9A}  % comment grey
+\definecolor{rsnum}{HTML}{1873CC}      % numeric output blue
+
+% geometry
+\def\W{15.6}    % total width
+\def\H{8.4}     % total height (panes)
+\def\gap{0.18}  % gap between panes
+\def\tabh{0.46} % tab strip height
+
+% pane sizes
+\pgfmathsetmacro{\paneW}{(\W-\gap)/2}
+\pgfmathsetmacro{\paneH}{(\H-\gap)/2}
+
+% positions
+\def\lx{0}
+\pgfmathsetmacro{\rx}{\paneW+\gap}
+\def\by{0}
+\pgfmathsetmacro{\ty}{\paneH+\gap}
+
+% ===================== title + menu bar =====================
+\fill[rsbar]  (0,\H+0.55) rectangle (\W,\H+1.05);
+\node[white,font=\sffamily\small\bfseries,anchor=west] at (0.22,\H+0.80) {RStudio};
+\fill[rsmenu] (0,\H) rectangle (\W,\H+0.55);
+\draw[rsborder] (0,\H) rectangle (\W,\H+0.55);
+\node[anchor=west,font=\sffamily\scriptsize,text=black!75] at (0.22,\H+0.275)
+  {File\quad Edit\quad Code\quad View\quad Plots\quad Session\quad Build\quad Tools\quad Help};
+
+% ===================== pane frame macro =====================
+% #1 x, #2 y (lower-left)
+\newcommand{\paneframe}[2]{
+  \fill[rspane] (#1,#2) rectangle (#1+\paneW,#2+\paneH);
+  \fill[rstab]  (#1,#2+\paneH-\tabh) rectangle (#1+\paneW,#2+\paneH);
+  \draw[rsborder] (#1,#2) rectangle (#1+\paneW,#2+\paneH);
+  \draw[rsborder] (#1,#2+\paneH-\tabh) -- (#1+\paneW,#2+\paneH-\tabh);
+}
+% active tab highlight: #1 x #2 y(pane LL) #3 tab-left #4 tab-right
+\newcommand{\activetab}[4]{
+  \fill[rspane] (#1+#3,#2+\paneH-\tabh) rectangle (#1+#4,#2+\paneH);
+  \draw[rsaccent,line width=1.6pt] (#1+#3,#2+\paneH) -- (#1+#4,#2+\paneH);
+  \draw[rsborder] (#1+#3,#2+\paneH-\tabh) -- (#1+#3,#2+\paneH);
+  \draw[rsborder] (#1+#4,#2+\paneH-\tabh) -- (#1+#4,#2+\paneH);
+}
+
+% ---- four pane frames ----
+\paneframe{\lx}{\ty}   % top-left  Source
+\paneframe{\lx}{\by}   % bottom-left Console
+\paneframe{\rx}{\ty}   % top-right Environment
+\paneframe{\rx}{\by}   % bottom-right Files
+
+% ---- active tabs ----
+\activetab{\lx}{\ty}{0.06}{1.95}   % analysis.R
+\activetab{\lx}{\by}{0.06}{1.55}   % Console
+\activetab{\rx}{\ty}{0.06}{2.05}   % Environment
+\activetab{\rx}{\by}{0.06}{1.05}   % Files
+
+% ---- tab labels ----
+\node[anchor=west,font=\sffamily\footnotesize\bfseries] at (\lx+0.18,\ty+\paneH-\tabh/2) {analysis.R};
+\node[anchor=west,font=\sffamily\footnotesize\bfseries] at (\lx+0.18,\by+\paneH-\tabh/2) {Console};
+\node[anchor=west,font=\sffamily\footnotesize\bfseries] at (\rx+0.18,\ty+\paneH-\tabh/2) {Environment};
+\node[anchor=west,font=\sffamily\footnotesize\bfseries] at (\rx+0.18,\by+\paneH-\tabh/2) {Files};
+\node[anchor=west,font=\sffamily\footnotesize,text=black!55] at (\rx+1.20,\by+\paneH-\tabh/2) {Plots\quad Help};
+
+% ====== Script editor (top-left) ======
+\begin{scope}[shift={(\lx,\ty)},font=\ttfamily\scriptsize]
+  \def\cy{\paneH-\tabh-0.32}     % first code line y
+  \def\dy{0.38}                  % line step
+  \draw[rsborder] (0.50,\paneH-\tabh) -- (0.50,0.06);   % gutter rule
+  \foreach \n in {1,...,5}{
+    \pgfmathsetmacro{\yy}{\cy-\dy*(\n-1)}
+    \node[anchor=east,rscomment] at (0.42,\yy) {\n};
+  }
+  \node[anchor=west,rscomment] at (0.62,\cy)        {\# load the package};
+  \node[anchor=west,black]     at (0.62,\cy-\dy)    {library(cSEM)};
+  \node[anchor=west,rscomment] at (0.62,\cy-3*\dy)  {\# a first calculation};
+  \node[anchor=west,black]     at (0.62,\cy-4*\dy)  {1 + 1};
+\end{scope}
+
+% ====== Console (bottom-left) ======
+\begin{scope}[shift={(\lx,\by)},font=\ttfamily\scriptsize]
+  \def\cy{\paneH-\tabh-0.32}
+  \def\dy{0.38}
+  \node[anchor=west,rsprompt] at (0.20,\cy)        {>};
+  \node[anchor=west,black]    at (0.48,\cy)        {1 + 1};
+  \node[anchor=west,rsnum]    at (0.20,\cy-\dy)    {[1]};
+  \node[anchor=west,black]    at (0.66,\cy-\dy)    {2};
+  \node[anchor=west,rsprompt] at (0.20,\cy-2*\dy)  {>};
+  \fill[black] (0.50,\cy-2*\dy-0.06) rectangle (0.57,\cy-2*\dy+0.13); % cursor
+\end{scope}
+
+% ====== Environment (top-right) ======
+\begin{scope}[shift={(\rx,\ty)},font=\sffamily\scriptsize]
+  % sub-header bar
+  \fill[rsmenu] (0,\paneH-\tabh-0.40) rectangle (\paneW,\paneH-\tabh);
+  \draw[rsborder] (0,\paneH-\tabh-0.40) -- (\paneW,\paneH-\tabh-0.40);
+  \node[anchor=west,font=\sffamily\scriptsize,text=black!70]
+    at (0.15,\paneH-\tabh-0.20) {\textbf{R} $\;\bullet\;$ Global Environment};
+  \node[anchor=center,rscomment] at (\paneW/2,\paneH/2-0.2) {Environment is empty};
+\end{scope}
+
+% ====== Files / Plots / Help (bottom-right) ======
+\begin{scope}[shift={(\rx,\by)},font=\sffamily\scriptsize]
+  \node[anchor=center,rscomment,align=center] at (\paneW/2,\paneH/2-0.2)
+    {Files, plots, and help\\pages are shown here};
+\end{scope}
+
+\end{tikzpicture}
+\caption{The four panes of the \textsf{RStudio} interface: the script editor
+(upper left), the \emph{Console} (lower left), the \emph{Environment} pane
+(upper right), and the files/plots/help pane (lower right).}
+\label{fig:rstudio}
+\end{figure}
+
+\end{document}
