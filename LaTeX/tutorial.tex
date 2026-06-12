@@ -213,6 +213,7 @@ Section
 
 
 \section{cSEM R package Illustration}
+\subsection{First steps in \textsf{R}}
 This section illustrates how to apply PLSc using the \pkg{cSEM} package, starting
 from the very first steps. It assumes no prior experience with \textsf{R}; readers
 already familiar with \textsf{R} and \textsf{RStudio} may skip directly to
@@ -232,7 +233,7 @@ editor} (upper left), where code is written and saved, and the \emph{Console}
 memory, and the fourth pane (lower right) provides access to files, plots, and
 help pages.
 
-Although code can be typed directly into the Console, it is good practice to
+Although code can be typed directly into the console, it is good practice to
 work in a script, since a script can be saved, shared, and re-run, which is
 essential for reproducible analyses. To create a new script, click
 \textsf{File~$\rightarrow$ New File~$\rightarrow$ R Script}. The typical workflow
@@ -251,16 +252,47 @@ available on CRAN, so the most recent stable version can be installed with:
 install.packages("cSEM")
 \end{lstlisting}
 Installation only needs to be done once per machine (rerun this line to update
-the package later). After installation, the package must be loaded at the start
-of every new \textsf{R} session before its functions become available:
+the package later). 
+Moreover, development versions can be installed from GitHub: \url{https://github.com/FloSchuberth/cSEM}.
+After installation, the package must be loaded at the start of every new \textsf{R} session before its functions become available:
 \begin{lstlisting}
 library(cSEM)
 \end{lstlisting}
 With \pkg{cSEM} installed and loaded, we can now import the data and specify the
 model, as described in the following sections.
 
+\subsection{Model and Data}
+\label{sec:model-data}
+The \pkg{cSEM} package \citep{csem} offers a variety of composite-based approaches to SEM including PLS-PM and PLSc.
+To illustrate the application of PLSc using cSEM, we use the data and model used in  \citet{Cheah2026} to demonstrate SmartPLS. 
+Similarly, we compare the results to those of the maximum-likelihood estimation as implemented in the R package lavaan \citep{Rosseel2012,Rosseel2025}. 
+
+Following \citet{Cheah2026}, our illustration draws on the employee retention model introduced by \citet[Chapter~13]{Hair2019c}.
+The model explains the effects of organizational commitment~(OC) and job satisfaction~(JS) on employees' staying intentions~(SI), with work environment perceptions~(EP) and attitudes toward coworkers~(AC) as exogenous antecedent constructs. 
+Five constructs are reflectively measured by a total of 21 indicators. 
+A detailed description of the indicators can be found in \citet{Cheah2026}.
+The model is presented in Figure \ref{}
+
+The central function is \fn{csem()}, which accepts a model specification in \pkg{lavaan}-style syntax and a dataset, and returns an object containing all estimation results. Key arguments include:
+\begin{description}
+  \item[\prm{.data}] A data frame or matrix containing the observed indicator variables.
+  \item[\prm{.model}] A model string written in \pkg{lavaan} syntax, with \texttt{=\textasciitilde} for measurement relations and \texttt{\textasciitilde} for structural (regression) relations.
+  \item[\prm{.approach\_weights}] The weighting scheme for computing composite scores. Set to \texttt{"PLS-PM"} for PLS-based estimation (the default).
+  \item[\prm{.disattenuate}] Logical. When set to \texttt{TRUE}, \pkg{cSEM} applies the PLSc correction for attenuation, yielding consistent estimates under the common factor model. This is the key switch that distinguishes PLSc-SEM from standard PLS-SEM.
+  \item[\prm{.PLS\_weight\_scheme\_inner}] The inner weighting scheme; options include \texttt{"path"} (default), \texttt{"centroid"}, and \texttt{"factorial"}.
+\end{description}
+
+When loading own datasets in R users need to ensure they are formatted as dataframes or matrices before using cSEM functions. 
+To do that users can formate the datasets with as.data.frame() or as.matrix(). 
 
 
+Additional post estimation functions include \fn{assess()} for measurement and structural model quality criteria, \fn{summarize()} for a comprehensive results summary, \fn{infer()} for bootstrap-based inference, \fn{testOMF()} for the overall model fit test, and \fn{predict()} for out-of-sample prediction.
+
+
+
+\subsection{Model specification}
+
+\subsection{PLSc-SEM Estimation}
 
 
 
