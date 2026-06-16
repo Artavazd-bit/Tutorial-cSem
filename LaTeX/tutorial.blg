@@ -1,0 +1,72 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: tutorial.aux
+Reallocating 'name_of_file' (item size: 1) to 8 items.
+The style file: apacite.bst
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+Reallocating 'glb_str_end' (item size: 4) to 20 items.
+Reallocating 'glb_str_ptr' (item size: 4) to 20 items.
+Reallocating 'global_strs' (item size: 1) to 4000000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 9000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: tutorial.bib
+Repeated entry---line 971 of file tutorial.bib
+ : @article{Dijkstra2014a
+ :                       ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "UNESCO"
+Warning--I didn't find a database entry for ""
+Warning--I didn't find a database entry for "Hair2026primer"
+Warning--I didn't find a database entry for "Sarstedt2025"
+Warning--I didn't find a database entry for "Henseler2015"
+Warning--I didn't find a database entry for "Franke2019"
+Warning--I didn't find a database entry for "Hu1999"
+Warning--I didn't find a database entry for "Sarstedt2024"
+Warning--I didn't find a database entry for "Shmueli2019"
+apacite.bst [2013/07/21 v6.03 APA bibliography style]
+You've used 48 entries,
+            6951 wiz_defined-function locations,
+            1648 strings with 20217 characters,
+and the built_in function-call counts, 93167 in all, are:
+= -- 11454
+> -- 805
+< -- 4400
++ -- 4534
+- -- 101
+* -- 6114
+:= -- 16689
+add.period$ -- 201
+call.type$ -- 48
+change.case$ -- 839
+chr.to.int$ -- 0
+cite$ -- 96
+duplicate$ -- 2654
+empty$ -- 3765
+format.name$ -- 1368
+if$ -- 17797
+int.to.chr$ -- 0
+int.to.str$ -- 148
+missing$ -- 0
+newline$ -- 1296
+num.names$ -- 389
+pop$ -- 1911
+preamble$ -- 1
+purify$ -- 196
+quote$ -- 0
+skip$ -- 5576
+stack$ -- 0
+substring$ -- 4951
+swap$ -- 1595
+text.length$ -- 120
+text.prefix$ -- 0
+top$ -- 1
+type$ -- 4032
+warning$ -- 0
+while$ -- 473
+width$ -- 0
+write$ -- 1613
+(There was 1 error message)

@@ -1,5 +1,55 @@
 % !Rnw weave = knitr
-\documentclass[12pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlsng}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hldef}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 \usepackage[ansinew]{inputenc}
 \usepackage[english]{babel}
 \usepackage{amsmath,amsfonts,amssymb}
@@ -74,22 +124,10 @@
 \newcommand{\prm}[1]{\texttt{#1}}
 \newcommand{\fn}[1]{\texttt{#1}}   % function names
 \newcommand{\op}[1]{\texttt{#1}}   % operators / inline code
-
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
-<<setup, include=FALSE>>=
-library(knitr)
-opts_chunk$set(
-  eval       = FALSE,   # code is displayed, not executed (no data shipped with the paper)
-  echo       = TRUE,
-  highlight  = TRUE,
-  background = "#F8F8F8",
-  size       = "small",
-  comment    = NA,
-  prompt     = FALSE,
-  tidy       = FALSE
-)
-@
+
 
 \pagenumbering{gobble}
 
@@ -224,21 +262,33 @@ To create a new script, click \textsf{File~$\rightarrow$ New File~$\rightarrow$ 
 The typical workflow is to write code in the editor and run the selected line(s) with \texttt{Ctrl~+~Enter}.
 Any line beginning with \texttt{\#} is treated as a comment: it documents what the code does and is ignored when the code runs.
 
-<<intro-comment>>=
-# This is a comment and is not executed.
-1 + 1   # Code is executed; the result is printed in the Console.
-@
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# This is a comment and is not executed.}
+\hlnum{1} \hlopt{+} \hlnum{1}   \hlcom{# Code is executed; the result is printed in the Console.}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Before \pkg{cSEM} can be used, it must be installed. The \pkg{cSEM} package is available on CRAN, so the most recent stable version can be installed with:
-<<install-csem>>=
-install.packages("cSEM")
-@
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{install.packages}\hldef{(}\hlsng{"cSEM"}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 Installation only needs to be done once per machine (rerun this line to update the package later).
 Moreover, development versions can be installed from GitHub: \url{https://github.com/FloSchuberth/cSEM}.
 After installation, the package must be loaded at the start of every new \textsf{R} session before its functions become available:
-<<load-csem>>=
-library(cSEM)
-@
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hldef{(cSEM)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 With \pkg{cSEM} installed and loaded, we can now import the data and specify the model, as described in the following sections.
 
 \input{"plots/rstudio_test.tex"}
@@ -285,8 +335,10 @@ In addition, the \texttt{~} operator is used to specify the relations among cons
 In case, an observed variable should be directly accounted for in the structural model, it must be specified as a single indicator construct, as common in PLS-PM \citep{}.
 The \pkg{cSEM} specification of the retention model illustrated in Figure \ref{fig:retentionmodel} is as follows:
 
-<<model-spec>>=
-model <- "
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{model} \hlkwb{<-} \hlsng{"
   # Measurement model
   AC =~ AC1 + AC2 + AC3 + AC4
   EP =~ EP1 + EP2 + EP3 + EP4
@@ -298,8 +350,10 @@ model <- "
   JS ~ EP + AC
   OC ~ EP + AC + JS
   SI ~ JS + OC
-"
-@
+"}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 
 
@@ -311,66 +365,82 @@ These arguments include
 
 To ultimately estimate the model using PLSc-SEM, we call \fn{csem()} with \prm{.disattenuate~=~TRUE}. This single argument activates the consistent correction that distinguishes PLSc-SEM from standard PLS-SEM:
 
-<<plsc-est>>=
-# PLSc-SEM estimation
-res_plsc <- csem(
-  .data                    = hbat_sub,
-  .model                   = model,
-  .approach_weights        = "PLS-PM",
-  .disattenuate            = TRUE,
-  .PLS_weight_scheme_inner = "path"
-)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# PLSc-SEM estimation}
+\hldef{res_plsc} \hlkwb{<-} \hlkwd{csem}\hldef{(}
+  \hlkwc{.data}                    \hldef{= hbat_sub,}
+  \hlkwc{.model}                   \hldef{= model,}
+  \hlkwc{.approach_weights}        \hldef{=} \hlsng{"PLS-PM"}\hldef{,}
+  \hlkwc{.disattenuate}            \hldef{=} \hlnum{TRUE}\hldef{,}
+  \hlkwc{.PLS_weight_scheme_inner} \hldef{=} \hlsng{"path"}
+\hldef{)}
 
-# Verify convergence
-verify(res_plsc)
-@
+\hlcom{# Verify convergence}
+\hlkwd{verify}\hldef{(res_plsc)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 The \fn{verify()} function checks whether the PLS algorithm converged, whether all construct reliability estimates~($\rho_\text{A}$) are positive (a necessary condition for the PLSc correction), and whether the model-implied indicator correlation matrix is admissible. If all checks pass, the estimation can be considered successful.
 
 To obtain a comprehensive overview of all results, including loadings, path coefficients, reliability measures, and $R^2$ values, use:
 
-<<summary-res>>=
-# Full results summary
-summary_res <- summarize(res_plsc)
-print(summary_res)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Full results summary}
+\hldef{summary_res} \hlkwb{<-} \hlkwd{summarize}\hldef{(res_plsc)}
+\hlkwd{print}\hldef{(summary_res)}
 
-# For a more compact overview
-summary_res$Estimates$Loading_estimates
-summary_res$Estimates$Path_estimates
-@
+\hlcom{# For a more compact overview}
+\hldef{summary_res}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Loading_estimates}
+\hldef{summary_res}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Path_estimates}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 For comparison, standard PLS-SEM (without the consistency correction) can be obtained by setting \prm{.disattenuate~=~FALSE}:
 
-<<pls-est>>=
-# Standard PLS-SEM (without correction)
-res_pls <- csem(
-  .data             = hbat_sub,
-  .model            = model,
-  .approach_weights = "PLS-PM",
-  .disattenuate     = FALSE
-)
-@
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Standard PLS-SEM (without correction)}
+\hldef{res_pls} \hlkwb{<-} \hlkwd{csem}\hldef{(}
+  \hlkwc{.data}             \hldef{= hbat_sub,}
+  \hlkwc{.model}            \hldef{= model,}
+  \hlkwc{.approach_weights} \hldef{=} \hlsng{"PLS-PM"}\hldef{,}
+  \hlkwc{.disattenuate}     \hldef{=} \hlnum{FALSE}
+\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 % ── 3.4 Measurement Model Assessment ─────────────────────────────────
 \subsection{Measurement Model Assessment}
 
 Following the guidelines described in \citet[Chapter~4]{Hair2026primer} and \citet{Sarstedt2025}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
 
-<<assess-quality>>=
-# Compute all quality criteria
-quality <- assess(res_plsc)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Compute all quality criteria}
+\hldef{quality} \hlkwb{<-} \hlkwd{assess}\hldef{(res_plsc)}
 
-# Internal consistency reliability
-quality$Cronbachs_alpha      # Cronbach's alpha
-quality$RhoA                 # Dijkstra-Henseler rho_A
-quality$RhoC                 # Composite reliability (Joreskog rho_C)
+\hlcom{# Internal consistency reliability}
+\hldef{quality}\hlopt{$}\hldef{Cronbachs_alpha}      \hlcom{# Cronbach's alpha}
+\hldef{quality}\hlopt{$}\hldef{RhoA}                 \hlcom{# Dijkstra-Henseler rho_A}
+\hldef{quality}\hlopt{$}\hldef{RhoC}                 \hlcom{# Composite reliability (Joreskog rho_C)}
 
-# Convergent validity
-quality$AVE                  # Average variance extracted
+\hlcom{# Convergent validity}
+\hldef{quality}\hlopt{$}\hldef{AVE}                  \hlcom{# Average variance extracted}
 
-# Indicator loadings
-summary_res$Estimates$Loading_estimates
-@
+\hlcom{# Indicator loadings}
+\hldef{summary_res}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Loading_estimates}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 % ── Table 1 ──────────────────────────────────────────────────────────
 \begin{table}[htbp]
@@ -417,26 +487,30 @@ The results in Table~\ref{tab:measurement} indicate that all constructs meet the
 
 Discriminant validity is assessed using the heterotrait-monotrait ratio of correlations \citep[HTMT;][]{Henseler2015}. In \pkg{cSEM}, HTMT values are available via \fn{assess()}:
 
-<<htmt>>=
-# HTMT values
-quality$HTMT
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# HTMT values}
+\hldef{quality}\hlopt{$}\hldef{HTMT}
 
-# Bootstrap confidence intervals for HTMT
-res_plsc_boot <- csem(
-  .data             = hbat_sub,
-  .model            = model,
-  .approach_weights = "PLS-PM",
-  .disattenuate     = TRUE,
-  .resample_method  = "bootstrap",
-  .R                = 10000,
-  .seed             = 42
-)
+\hlcom{# Bootstrap confidence intervals for HTMT}
+\hldef{res_plsc_boot} \hlkwb{<-} \hlkwd{csem}\hldef{(}
+  \hlkwc{.data}             \hldef{= hbat_sub,}
+  \hlkwc{.model}            \hldef{= model,}
+  \hlkwc{.approach_weights} \hldef{=} \hlsng{"PLS-PM"}\hldef{,}
+  \hlkwc{.disattenuate}     \hldef{=} \hlnum{TRUE}\hldef{,}
+  \hlkwc{.resample_method}  \hldef{=} \hlsng{"bootstrap"}\hldef{,}
+  \hlkwc{.R}                \hldef{=} \hlnum{10000}\hldef{,}
+  \hlkwc{.seed}             \hldef{=} \hlnum{42}
+\hldef{)}
 
-# Extract HTMT inference
-htmt_infer <- infer(res_plsc_boot)
-# The infer() output includes CIs for all quality criteria
-# including HTMT values
-@
+\hlcom{# Extract HTMT inference}
+\hldef{htmt_infer} \hlkwb{<-} \hlkwd{infer}\hldef{(res_plsc_boot)}
+\hlcom{# The infer() output includes CIs for all quality criteria}
+\hlcom{# including HTMT values}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 % ── Table 2 ──────────────────────────────────────────────────────────
 \begin{table}[htbp]
@@ -468,10 +542,14 @@ The HTMT results in Table~\ref{tab:htmt} confirm discriminant validity: none of 
 
 Before interpreting the structural model, we check for collinearity among predictor constructs by examining variance inflation factors (VIF). In \pkg{cSEM}, VIF values are available through the \fn{assess()} function:
 
-<<vif>>=
-# VIF values for structural model
-quality$VIF
-@
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# VIF values for structural model}
+\hldef{quality}\hlopt{$}\hldef{VIF}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 All VIF values should be below the critical threshold of three \citep{Hair2026primer}, indicating that multicollinearity is not a concern.
 
@@ -479,16 +557,20 @@ All VIF values should be below the critical threshold of three \citep{Hair2026pr
 
 To evaluate the statistical significance of the structural relationships, we rely on bootstrap confidence intervals. The bootstrap estimation was already conducted above. Path coefficients and their confidence intervals are extracted as follows:
 
-<<path-coef>>=
-# Extract path coefficient estimates
-summarize(res_plsc)$Estimates$Path_estimates
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Extract path coefficient estimates}
+\hlkwd{summarize}\hldef{(res_plsc)}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Path_estimates}
 
-# Bootstrap inference for path coefficients
-boot_infer <- infer(res_plsc_boot)
+\hlcom{# Bootstrap inference for path coefficients}
+\hldef{boot_infer} \hlkwb{<-} \hlkwd{infer}\hldef{(res_plsc_boot)}
 
-# Percentile bootstrap confidence intervals (95%)
-boot_infer$Path_estimates$CI_percentile
-@
+\hlcom{# Percentile bootstrap confidence intervals (95%)}
+\hldef{boot_infer}\hlopt{$}\hldef{Path_estimates}\hlopt{$}\hldef{CI_percentile}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 % ── Table 3 ──────────────────────────────────────────────────────────
 \begin{table}[htbp]
@@ -520,10 +602,14 @@ The structural model results in Table~\ref{tab:structural} are consistent with t
 
 Cohen's $f^2$ effect sizes quantify the substantive impact of each predictor. In \pkg{cSEM}:
 
-<<effect-sizes>>=
-# Effect sizes
-quality$F2
-@
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Effect sizes}
+\hldef{quality}\hlopt{$}\hldef{F2}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 The paths EP~$\to$~OC ($f^2 = 0.227$) and OC~$\to$~SI ($f^2 = 0.321$) show medium to large effects, while the remaining significant paths exhibit small effects. The AC~$\to$~JS relationship has a trivial effect size of essentially zero.
 
@@ -531,23 +617,27 @@ The paths EP~$\to$~OC ($f^2 = 0.227$) and OC~$\to$~SI ($f^2 = 0.321$) show mediu
 
 Following \citet{Schuberth2023}, we assess model fit using the \fn{testOMF()} function, which implements a bootstrap-based test comparing the empirical and model-implied correlation matrices:
 
-<<model-fit>>=
-# Overall model fit test
-fit_test <- testOMF(
-  res_plsc,
-  .R                      = 10000,
-  .seed                   = 42,
-  .handle_inadmissibles   = "replace"
-)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Overall model fit test}
+\hldef{fit_test} \hlkwb{<-} \hlkwd{testOMF}\hldef{(}
+  \hldef{res_plsc,}
+  \hlkwc{.R}                      \hldef{=} \hlnum{10000}\hldef{,}
+  \hlkwc{.seed}                   \hldef{=} \hlnum{42}\hldef{,}
+  \hlkwc{.handle_inadmissibles}   \hldef{=} \hlsng{"replace"}
+\hldef{)}
 
-# Print results
-fit_test
+\hlcom{# Print results}
+\hldef{fit_test}
 
-# The output includes:
-# - SRMR and its bootstrap-based critical value
-# - dULS (squared Euclidean distance) and critical value
-# - dG (geodesic distance) and critical value
-@
+\hlcom{# The output includes:}
+\hlcom{# - SRMR and its bootstrap-based critical value}
+\hlcom{# - dULS (squared Euclidean distance) and critical value}
+\hlcom{# - dG (geodesic distance) and critical value}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 % ── Table 4 ──────────────────────────────────────────────────────────
 \begin{table}[htbp]
@@ -578,11 +668,13 @@ Consistent with \citet[Table~4]{Cheah2026}, the SRMR of 0.071 falls below the co
 
 A key advantage of working in R is the seamless ability to compare PLSc-SEM results with those from CB-SEM using the \pkg{lavaan} package \citep{Rosseel2012}. This allows researchers to conduct the multimethod estimation strategy advocated by \citet{Cheah2026} and \citet{Sarstedt2024} entirely within one script:
 
-<<cbsem-lavaan>>=
-# CB-SEM via lavaan
-library(lavaan)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# CB-SEM via lavaan}
+\hlkwd{library}\hldef{(lavaan)}
 
-lavaan_model <- "
+\hldef{lavaan_model} \hlkwb{<-} \hlsng{"
   # Measurement model
   AC =~ AC1 + AC2 + AC3 + AC4
   EP =~ EP1 + EP2 + EP3 + EP4
@@ -594,33 +686,39 @@ lavaan_model <- "
   JS ~ EP + AC
   OC ~ EP + AC + JS
   SI ~ JS + OC
-"
+"}
 
-fit_cbsem <- sem(lavaan_model, data = hbat_sub)
-summary(fit_cbsem, fit.measures = TRUE, standardized = TRUE)
+\hldef{fit_cbsem} \hlkwb{<-} \hlkwd{sem}\hldef{(lavaan_model,} \hlkwc{data} \hldef{= hbat_sub)}
+\hlkwd{summary}\hldef{(fit_cbsem,} \hlkwc{fit.measures} \hldef{=} \hlnum{TRUE}\hldef{,} \hlkwc{standardized} \hldef{=} \hlnum{TRUE}\hldef{)}
 
-# Extract standardized path coefficients
-parameterEstimates(fit_cbsem, standardized = TRUE) |>
-  subset(op == "~", select = c(lhs, op, rhs, est, std.all, pvalue))
-@
+\hlcom{# Extract standardized path coefficients}
+\hlkwd{parameterEstimates}\hldef{(fit_cbsem,} \hlkwc{standardized} \hldef{=} \hlnum{TRUE}\hldef{) |>}
+  \hlkwd{subset}\hldef{(op} \hlopt{==} \hlsng{"~"}\hldef{,} \hlkwc{select} \hldef{=} \hlkwd{c}\hldef{(lhs, op, rhs, est, std.all, pvalue))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 The \pkg{lavaan} model specification is identical to the \pkg{cSEM} specification, making side-by-side comparison straightforward. We can extract and compare the structural path coefficients:
 
-<<compare-paths>>=
-# Compare structural path coefficients
-# PLSc-SEM
-plsc_paths <- summarize(res_plsc)$Estimates$Path_estimates
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Compare structural path coefficients}
+\hlcom{# PLSc-SEM}
+\hldef{plsc_paths} \hlkwb{<-} \hlkwd{summarize}\hldef{(res_plsc)}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Path_estimates}
 
-# CB-SEM
-cbsem_paths <- parameterEstimates(fit_cbsem, standardized = TRUE)
-cbsem_struct <- cbsem_paths[cbsem_paths$op == "~",
-                            c("lhs", "rhs", "std.all")]
+\hlcom{# CB-SEM}
+\hldef{cbsem_paths} \hlkwb{<-} \hlkwd{parameterEstimates}\hldef{(fit_cbsem,} \hlkwc{standardized} \hldef{=} \hlnum{TRUE}\hldef{)}
+\hldef{cbsem_struct} \hlkwb{<-} \hldef{cbsem_paths[cbsem_paths}\hlopt{$}\hldef{op} \hlopt{==} \hlsng{"~"}\hldef{,}
+                            \hlkwd{c}\hldef{(}\hlsng{"lhs"}\hldef{,} \hlsng{"rhs"}\hldef{,} \hlsng{"std.all"}\hldef{)]}
 
-# Model fit comparison
-fitMeasures(fit_cbsem, c("chisq", "df", "pvalue", "rmsea",
-                          "rmsea.ci.lower", "rmsea.ci.upper",
-                          "srmr", "cfi", "tli", "nfi"))
-@
+\hlcom{# Model fit comparison}
+\hlkwd{fitMeasures}\hldef{(fit_cbsem,} \hlkwd{c}\hldef{(}\hlsng{"chisq"}\hldef{,} \hlsng{"df"}\hldef{,} \hlsng{"pvalue"}\hldef{,} \hlsng{"rmsea"}\hldef{,}
+                          \hlsng{"rmsea.ci.lower"}\hldef{,} \hlsng{"rmsea.ci.upper"}\hldef{,}
+                          \hlsng{"srmr"}\hldef{,} \hlsng{"cfi"}\hldef{,} \hlsng{"tli"}\hldef{,} \hlsng{"nfi"}\hldef{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 In line with the findings of \citet[Figure~4]{Cheah2026}, the CB-SEM and PLSc-SEM path coefficient estimates closely correspond. The CB-SEM model fit indices (RMSEA~=~0.038, SRMR~=~0.060, CFI~=~0.976) confirm good model fit, supporting the conclusions drawn from the PLSc-SEM analysis.
 
@@ -631,26 +729,30 @@ In line with the findings of \citet[Figure~4]{Cheah2026}, the CB-SEM and PLSc-SE
 
 An instructive exercise is to compare PLSc-SEM with standard PLS-SEM to see the effect of the consistency correction. In \pkg{cSEM}, this is achieved simply by toggling \prm{.disattenuate}:
 
-<<compare-plsc-pls>>=
-# Standard PLS-SEM (no correction)
-res_pls <- csem(
-  .data             = hbat_sub,
-  .model            = model,
-  .approach_weights = "PLS-PM",
-  .disattenuate     = FALSE
-)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Standard PLS-SEM (no correction)}
+\hldef{res_pls} \hlkwb{<-} \hlkwd{csem}\hldef{(}
+  \hlkwc{.data}             \hldef{= hbat_sub,}
+  \hlkwc{.model}            \hldef{= model,}
+  \hlkwc{.approach_weights} \hldef{=} \hlsng{"PLS-PM"}\hldef{,}
+  \hlkwc{.disattenuate}     \hldef{=} \hlnum{FALSE}
+\hldef{)}
 
-# Side-by-side comparison
-plsc_est <- summarize(res_plsc)$Estimates$Path_estimates
-pls_est  <- summarize(res_pls)$Estimates$Path_estimates
+\hlcom{# Side-by-side comparison}
+\hldef{plsc_est} \hlkwb{<-} \hlkwd{summarize}\hldef{(res_plsc)}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Path_estimates}
+\hldef{pls_est}  \hlkwb{<-} \hlkwd{summarize}\hldef{(res_pls)}\hlopt{$}\hldef{Estimates}\hlopt{$}\hldef{Path_estimates}
 
-comparison <- merge(
-  plsc_est[, c("Name", "Estimate")],
-  pls_est[, c("Name", "Estimate")],
-  by = "Name", suffixes = c("_PLSc", "_PLS")
-)
-print(comparison)
-@
+\hldef{comparison} \hlkwb{<-} \hlkwd{merge}\hldef{(}
+  \hldef{plsc_est[,} \hlkwd{c}\hldef{(}\hlsng{"Name"}\hldef{,} \hlsng{"Estimate"}\hldef{)],}
+  \hldef{pls_est[,} \hlkwd{c}\hldef{(}\hlsng{"Name"}\hldef{,} \hlsng{"Estimate"}\hldef{)],}
+  \hlkwc{by} \hldef{=} \hlsng{"Name"}\hldef{,} \hlkwc{suffixes} \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"_PLSc"}\hldef{,} \hlsng{"_PLS"}\hldef{)}
+\hldef{)}
+\hlkwd{print}\hldef{(comparison)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 As expected from the methodological literature \citep{Dijkstra2015}, the standard PLS-SEM path coefficients are attenuated (biased toward zero) relative to the PLSc-SEM estimates. The attenuation is most visible for paths involving constructs with lower reliability (e.g., OC, which has a relatively low loading for OC1). The PLSc correction recovers the consistent estimates that would be expected under the common factor model.
 
@@ -661,22 +763,24 @@ As expected from the methodological literature \citep{Dijkstra2015}, the standar
 
 For convenience, we present a compact, self-contained R script that reproduces the complete PLSc-SEM analysis. This script can serve as a template for researchers applying PLSc-SEM with \pkg{cSEM} to their own datasets:
 
-<<compact-workflow>>=
-# ============================================================
-# PLSc-SEM Analysis with cSEM: Compact Reproducible Script
-# ============================================================
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.973, 0.973, 0.973}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# ============================================================}
+\hlcom{# PLSc-SEM Analysis with cSEM: Compact Reproducible Script}
+\hlcom{# ============================================================}
 
-# 1. Setup ----
-library(cSEM)
+\hlcom{# 1. Setup ----}
+\hlkwd{library}\hldef{(cSEM)}
 
-hbat <- read.csv("HBAT_Employee_Retention.csv", sep = ";")
-vars <- c(paste0("AC", 1:4), paste0("EP", 1:4),
-          paste0("JS", 1:5), paste0("OC", 1:4),
-          paste0("SI", 1:4))
-dat <- hbat[, vars]
+\hldef{hbat} \hlkwb{<-} \hlkwd{read.csv}\hldef{(}\hlsng{"HBAT_Employee_Retention.csv"}\hldef{,} \hlkwc{sep} \hldef{=} \hlsng{";"}\hldef{)}
+\hldef{vars} \hlkwb{<-} \hlkwd{c}\hldef{(}\hlkwd{paste0}\hldef{(}\hlsng{"AC"}\hldef{,} \hlnum{1}\hlopt{:}\hlnum{4}\hldef{),} \hlkwd{paste0}\hldef{(}\hlsng{"EP"}\hldef{,} \hlnum{1}\hlopt{:}\hlnum{4}\hldef{),}
+          \hlkwd{paste0}\hldef{(}\hlsng{"JS"}\hldef{,} \hlnum{1}\hlopt{:}\hlnum{5}\hldef{),} \hlkwd{paste0}\hldef{(}\hlsng{"OC"}\hldef{,} \hlnum{1}\hlopt{:}\hlnum{4}\hldef{),}
+          \hlkwd{paste0}\hldef{(}\hlsng{"SI"}\hldef{,} \hlnum{1}\hlopt{:}\hlnum{4}\hldef{))}
+\hldef{dat} \hlkwb{<-} \hldef{hbat[, vars]}
 
-# 2. Model specification ----
-model <- "
+\hlcom{# 2. Model specification ----}
+\hldef{model} \hlkwb{<-} \hlsng{"
   AC =~ AC1 + AC2 + AC3 + AC4
   EP =~ EP1 + EP2 + EP3 + EP4
   JS =~ JS1 + JS2 + JS3 + JS4 + JS5
@@ -685,31 +789,33 @@ model <- "
   JS ~ EP + AC
   OC ~ EP + AC + JS
   SI ~ JS + OC
-"
+"}
 
-# 3. PLSc-SEM estimation ----
-res <- csem(dat, model,
-            .approach_weights = "PLS-PM",
-            .disattenuate = TRUE)
-verify(res)
+\hlcom{# 3. PLSc-SEM estimation ----}
+\hldef{res} \hlkwb{<-} \hlkwd{csem}\hldef{(dat, model,}
+            \hlkwc{.approach_weights} \hldef{=} \hlsng{"PLS-PM"}\hldef{,}
+            \hlkwc{.disattenuate} \hldef{=} \hlnum{TRUE}\hldef{)}
+\hlkwd{verify}\hldef{(res)}
 
-# 4. Assessment ----
-q <- assess(res)
-q$Cronbachs_alpha; q$RhoA; q$RhoC; q$AVE
-q$HTMT; q$VIF; q$F2
+\hlcom{# 4. Assessment ----}
+\hldef{q} \hlkwb{<-} \hlkwd{assess}\hldef{(res)}
+\hldef{q}\hlopt{$}\hldef{Cronbachs_alpha; q}\hlopt{$}\hldef{RhoA; q}\hlopt{$}\hldef{RhoC; q}\hlopt{$}\hldef{AVE}
+\hldef{q}\hlopt{$}\hldef{HTMT; q}\hlopt{$}\hldef{VIF; q}\hlopt{$}\hldef{F2}
 
-# 5. Bootstrap inference ----
-res_boot <- csem(dat, model,
-                 .approach_weights = "PLS-PM",
-                 .disattenuate = TRUE,
-                 .resample_method = "bootstrap",
-                 .R = 10000, .seed = 42)
-infer(res_boot)
+\hlcom{# 5. Bootstrap inference ----}
+\hldef{res_boot} \hlkwb{<-} \hlkwd{csem}\hldef{(dat, model,}
+                 \hlkwc{.approach_weights} \hldef{=} \hlsng{"PLS-PM"}\hldef{,}
+                 \hlkwc{.disattenuate} \hldef{=} \hlnum{TRUE}\hldef{,}
+                 \hlkwc{.resample_method} \hldef{=} \hlsng{"bootstrap"}\hldef{,}
+                 \hlkwc{.R} \hldef{=} \hlnum{10000}\hldef{,} \hlkwc{.seed} \hldef{=} \hlnum{42}\hldef{)}
+\hlkwd{infer}\hldef{(res_boot)}
 
-# 6. Model fit ----
-testOMF(res, .R = 10000, .seed = 42,
-        .handle_inadmissibles = "replace")
-@
+\hlcom{# 6. Model fit ----}
+\hlkwd{testOMF}\hldef{(res,} \hlkwc{.R} \hldef{=} \hlnum{10000}\hldef{,} \hlkwc{.seed} \hldef{=} \hlnum{42}\hldef{,}
+        \hlkwc{.handle_inadmissibles} \hldef{=} \hlsng{"replace"}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 
 % ══════════════════════════════════════════════════════════════════════
