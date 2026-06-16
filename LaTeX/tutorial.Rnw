@@ -21,8 +21,7 @@
 \usepackage{multirow}
 \usepackage{float}
 \usepackage{listings} %for Appendix
-\usepackage{tikz,pgfplots}
-\usetikzlibrary{arrows,shapes.geometric,shapes.arrows,positioning,fit,calc,shapes.symbols,fit}
+\usepackage{tikz,pgfplots}\usetikzlibrary{arrows,shapes.geometric,shapes.arrows,positioning,fit,calc,shapes.symbols,fit}
 \pgfplotsset{compat = newest}
 
 
