@@ -241,7 +241,7 @@ library(cSEM)
 @
 With \pkg{cSEM} installed and loaded, we can now import the data and specify the model, as described in the following sections.
 
-\input{"plots/rstudio_test.tex"}
+\input{plots/rstudio_test.tex}
 
 \subsection{Model and Data}
 \label{sec:model-data}
