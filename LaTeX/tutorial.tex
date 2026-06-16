@@ -247,6 +247,8 @@ library(cSEM)
 \end{lstlisting}
 With \pkg{cSEM} installed and loaded, we can now import the data and specify the model, as described in the following sections.
 
+
+
 \subsection{Model and Data}
 \label{sec:model-data}
 The \pkg{cSEM} package \citep{csem} offers a variety of composite-based approaches to SEM including PLS-PM and PLSc.
@@ -257,7 +259,14 @@ Following \citet{Cheah2026}, our illustration draws on the employee retention mo
 The model explains the effects of organizational commitment~(OC) and job satisfaction~(JS) on employees' staying intentions~(SI), with work environment perceptions~(EP) and attitudes toward coworkers~(AC) as exogenous antecedent constructs. 
 Five constructs are reflectively measured by a total of 21 indicators. 
 A detailed description of the indicators can be found in \citet{Cheah2026}.
-The model is presented in Figure \ref{}.
+The model is presented in Figure \ref{fig:retentionmodel}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{LaTeX/plots/retention_model.pdf}
+    \caption{Employee Retention model}
+    \label{fig:retentionmodel}
+\end{figure}
 
 The central function is \fn{csem()}, which accepts a model specification in \pkg{lavaan}-style syntax and a dataset, and returns an object containing all estimation results.
 Key arguments include:
