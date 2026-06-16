@@ -67,3 +67,10 @@ rsconnect/
 paper/
 
 Data/
+
+# Latex ignore
+LaTeX/tutorial.log
+LaTeX/tutorial.synctex.gz
+LaTeX/tutorial.tex
+LaTeX/tutorial-concordance.tex
+LaTeX/tutorial.blg
