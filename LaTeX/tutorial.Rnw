@@ -353,7 +353,8 @@ res_pls <- csem(
 % ── 3.4 Measurement Model Assessment ─────────────────────────────────
 \subsection{Measurement Model Assessment}
 
-Following the guidelines described in \citet[Chapter~4]{Hair2026primer} and \citet{Sarstedt2025}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
+Following the guidelines described in \citet[Chapter~4]{Hair2026primer} and \citet{Sarstedt2025}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. 
+The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
 
 <<assess-quality>>=
 # Compute all quality criteria
