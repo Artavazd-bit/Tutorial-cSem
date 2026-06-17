@@ -230,7 +230,7 @@ Any line beginning with \texttt{\#} is treated as a comment: it documents what t
 
 Before \pkg{cSEM} can be used, it must be installed. The \pkg{cSEM} package is available on CRAN, so the most recent stable version can be installed with:
 
-<<install-csem, eval = FALSE, >>=
+<<install-csem, eval = FALSE >>=
 install.packages("cSEM")
 @
 
@@ -244,7 +244,7 @@ library(cSEM)
 
 With \pkg{cSEM} installed and loaded, we can now import the data and specify the model, as described in the following sections.
 
-\input{plots/rstudio_test.tex}
+\input{LaTeX/plots/rstudio_test.tex}
 
 \subsection{Model and Data}
 \label{sec:model-data}
@@ -261,7 +261,7 @@ The model is presented in Figure \ref{fig:retentionmodel}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\linewidth]{"plots/retention_model_preview.png"}
+    \includegraphics[width=0.7\linewidth]{"LaTeX/plots/retention_model_preview.png"}
     \caption{Employee Retention Model}
     \label{fig:retentionmodel}
 \end{figure}
