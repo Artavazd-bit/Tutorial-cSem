@@ -79,7 +79,7 @@
 <<setup, include=FALSE>>=
 library(knitr)
 opts_chunk$set(
-  eval       = FALSE,   # code is displayed, not executed (no data shipped with the paper)
+  eval       = TRUE,   # code is displayed, not executed (no data shipped with the paper)
   echo       = TRUE,
   highlight  = TRUE,
   background = "#F8F8F8",
@@ -223,14 +223,14 @@ To create a new script, click \textsf{File~$\rightarrow$ New File~$\rightarrow$ 
 The typical workflow is to write code in the editor and run the selected line(s) with \texttt{Ctrl~+~Enter}.
 Any line beginning with \texttt{\#} is treated as a comment: it documents what the code does and is ignored when the code runs.
 
-<<intro-comment>>=
+<<label = intro-comment>>=
 # This is a comment and is not executed.
 1 + 1   # Code is executed; the result is printed in the Console.
 @
 
 Before \pkg{cSEM} can be used, it must be installed. The \pkg{cSEM} package is available on CRAN, so the most recent stable version can be installed with:
 
-<<install-csem>>=
+<<install-csem, eval = FALSE, >>=
 install.packages("cSEM")
 @
 
@@ -431,9 +431,9 @@ summary_res$Estimates$Loading_estimates
 % \bottomrule
 % \end{tabular}
 
-\smallskip
-\footnotesize\textit{Note.} AC = attitudes toward coworkers; EP = environment perceptions; JS = job satisfaction; OC = organizational commitment; SI = staying intentions. Results replicate those in \citet[Table~1]{Cheah2026}.
-\end{table}
+%\smallskip
+%\footnotesize\textit{Note.} AC = attitudes toward coworkers; EP = environment perceptions; JS = job satisfaction; OC = organizational commitment; SI = staying intentions. Results replicate those in \citet[Table~1]{Cheah2026}.
+%\end{table}
 
 The results in Table~\ref{tab:measurement} indicate that all constructs meet the commonly accepted thresholds. All Cronbach's~$\alpha$ and $\rho_\text{A}$ values exceed 0.70, and all AVE values exceed 0.50, supporting internal consistency reliability and convergent validity. While some outer loadings (e.g., OC1~=~0.427) fall below the recommended threshold of 0.708, these indicators are retained because the corresponding constructs exhibit adequate reliability and AVE, and their retention preserves content validity \citep{Hair2026primer}.
 
