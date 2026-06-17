@@ -378,7 +378,7 @@ res_pls <- csem(
 % ── 3.4 Measurement Model Assessment ─────────────────────────────────
 \subsection{Measurement Model Assessment}
 
-Following the guidelines described in \citet[Chapter~4]{Hair2026primer} and \citet{Sarstedt2025}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. 
+Following the guidelines described in \citet[Chapter~4]{hair_primer_2017} and \citet{sarstedt_partial_2022}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. 
 The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
 
 <<assess-quality>>=
@@ -398,38 +398,38 @@ summary_res$Estimates$Loading_estimates
 @
 
 % ── Table 1 ──────────────────────────────────────────────────────────
-\begin{table}[htbp]
-\centering
-\caption{Reflective measurement model assessment results (PLSc-SEM via \pkg{cSEM}).}
-\label{tab:measurement}
-\small
-\begin{tabular}{llccccc}
-\toprule
-Construct & Item & Outer loading & Cronbach's $\alpha$ & $\rho_\text{A}$ & $\rho_\text{C}$ & AVE \\
-\midrule
-AC & AC1 & 0.770 & 0.894 & 0.911 & 0.926 & 0.679 \\
-   & AC2 & 0.677 & & & & \\
-   & AC3 & 0.823 & & & & \\
-   & AC4 & 0.993 & & & & \\[3pt]
-EP & EP1 & 0.631 & 0.857 & 0.869 & 0.903 & 0.605 \\
-   & EP2 & 0.875 & & & & \\
-   & EP3 & 0.763 & & & & \\
-   & EP4 & 0.821 & & & & \\[3pt]
-JS & JS1 & 0.618 & 0.844 & 0.856 & 0.888 & 0.518 \\
-   & JS2 & 0.696 & & & & \\
-   & JS3 & 0.715 & & & & \\
-   & JS4 & 0.628 & & & & \\
-   & JS5 & 0.903 & & & & \\[3pt]
-OC & OC1 & 0.427 & 0.832 & 0.887 & 0.886 & 0.573 \\
-   & OC2 & 0.958 & & & & \\
-   & OC3 & 0.682 & & & & \\
-   & OC4 & 0.852 & & & & \\[3pt]
-SI & SI1 & 0.817 & 0.889 & 0.899 & 0.923 & 0.672 \\
-   & SI2 & 0.870 & & & & \\
-   & SI3 & 0.677 & & & & \\
-   & SI4 & 0.897 & & & & \\
-\bottomrule
-\end{tabular}
+% \begin{table}[htbp]
+% \centering
+% \caption{Reflective measurement model assessment results (PLSc-SEM via \pkg{cSEM}).}
+% \label{tab:measurement}
+% \small
+% \begin{tabular}{llccccc}
+% \toprule
+% Construct & Item & Outer loading & Cronbach's $\alpha$ & $\rho_\text{A}$ & $\rho_\text{C}$ & AVE \\
+% \midrule
+% AC & AC1 & 0.770 & 0.894 & 0.911 & 0.926 & 0.679 \\
+%    & AC2 & 0.677 & & & & \\
+%    & AC3 & 0.823 & & & & \\
+%    & AC4 & 0.993 & & & & \\[3pt]
+% EP & EP1 & 0.631 & 0.857 & 0.869 & 0.903 & 0.605 \\
+%    & EP2 & 0.875 & & & & \\
+%    & EP3 & 0.763 & & & & \\
+%    & EP4 & 0.821 & & & & \\[3pt]
+% JS & JS1 & 0.618 & 0.844 & 0.856 & 0.888 & 0.518 \\
+%    & JS2 & 0.696 & & & & \\
+%    & JS3 & 0.715 & & & & \\
+%    & JS4 & 0.628 & & & & \\
+%    & JS5 & 0.903 & & & & \\[3pt]
+% OC & OC1 & 0.427 & 0.832 & 0.887 & 0.886 & 0.573 \\
+%    & OC2 & 0.958 & & & & \\
+%    & OC3 & 0.682 & & & & \\
+%    & OC4 & 0.852 & & & & \\[3pt]
+% SI & SI1 & 0.817 & 0.889 & 0.899 & 0.923 & 0.672 \\
+%    & SI2 & 0.870 & & & & \\
+%    & SI3 & 0.677 & & & & \\
+%    & SI4 & 0.897 & & & & \\
+% \bottomrule
+% \end{tabular}
 
 \smallskip
 \footnotesize\textit{Note.} AC = attitudes toward coworkers; EP = environment perceptions; JS = job satisfaction; OC = organizational commitment; SI = staying intentions. Results replicate those in \citet[Table~1]{Cheah2026}.
