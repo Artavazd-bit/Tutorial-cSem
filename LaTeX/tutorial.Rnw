@@ -229,15 +229,19 @@ Any line beginning with \texttt{\#} is treated as a comment: it documents what t
 @
 
 Before \pkg{cSEM} can be used, it must be installed. The \pkg{cSEM} package is available on CRAN, so the most recent stable version can be installed with:
+
 <<install-csem>>=
 install.packages("cSEM")
 @
+
 Installation only needs to be done once per machine (rerun this line to update the package later).
 Moreover, development versions can be installed from GitHub: \url{https://github.com/FloSchuberth/cSEM}.
 After installation, the package must be loaded at the start of every new \textsf{R} session before its functions become available:
+
 <<load-csem>>=
 library(cSEM)
 @
+
 With \pkg{cSEM} installed and loaded, we can now import the data and specify the model, as described in the following sections.
 
 \input{plots/rstudio_test.tex}
