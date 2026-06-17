@@ -207,9 +207,9 @@ Section
 
 \section{cSEM R package Illustration}
 \subsection{First steps in \textsf{R}}
-This section illustrates how to apply PLSc using the \pkg{cSEM} package, starting from the very first steps.
-It assumes no prior experience with \textsf{R};
-readers already familiar with \textsf{R} and \textsf{RStudio} may skip directly to Section~\ref{sec:model-data}.
+%This section illustrates how to apply PLSc using the \pkg{cSEM} package, starting from the very first steps.
+%It assumes no prior experience with \textsf{R};
+%readers already familiar with \textsf{R} and \textsf{RStudio} may skip directly to Section~\ref{sec:model-data}.
 
 To use the \pkg{cSEM} package, users first need to install \textsf{R} and an integrated development environment (IDE) such as \textsf{RStudio}.
 For the installation, we refer to the official guides for \textsf{R} (\url{https://cran.r-project.org}) and \textsf{RStudio} (\url{https://posit.co/download/rstudio-desktop}).
@@ -259,7 +259,7 @@ A detailed description of the indicators can be found in \citet{Cheah2026}.
 The model is presented in Figure \ref{fig:retentionmodel}.
 
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{"LaTeX/plots/retention_model_preview.png"}
     \caption{Employee Retention Model}
@@ -270,7 +270,7 @@ The dataset used for model estimation is publicly available from the SmartPLS we
 The synthetic dataset comprises $N = 400$ observations from HBAT Industries and was generated to satisfy the assumptions of factor-based SEM, including multivariate normality.
 For this tutorial, we assume the data have been downloaded as a CSV file.
 After downloading the dataset, it needs to be loaded into the R Environment.
-The Employee Retention Model is stored as an CSV File using ';' as the separator, thus it can be loaded into R using following command:
+The Employee Retention dataset is stored as an CSV File using ';' as the separator, thus it can be loaded into R using following command:
 
 <<load-data>>=
 # Import dataset
@@ -293,10 +293,10 @@ When using their own data, users must ensure it is stored as a data frame or a m
 %Additional post estimation functions include \fn{assess()} for measurement and structural model quality criteria, \fn{summarize()} for a comprehensive results summary, \fn{infer()} for bootstrap-based inference, \fn{testOMF()} for the overall model fit test, and \fn{predict()} for out-of-sample prediction.
 
 \subsection{Model specification}
-In \pkg{cSEM}, models are specified using the \pkg{lavaan} package \citep{lavaan} model syntax.
+In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
 In particular, the \texttt{=\~} and the \texttt{<\~} operators are used to define the relations between the constructs and their indicators.
-Specifically, the \texttt{=\~} operator is used to specify reflective measurement models, while the \texttt{<\~} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{lord_statistical_2008}.
+Specifically, the \texttt{=\~} operator is used to specify reflective measurement models, while the \texttt{<\~} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
 In addition, the \texttt{\~} operator is used to specify the relations among constructs.
 In case, an observed variable should be directly accounted for in the structural model, it must be specified as a single indicator construct, as common in PLS-PM \citep{}.
 The \pkg{cSEM} specification of the retention model illustrated in Figure \ref{fig:retentionmodel} is as follows:
