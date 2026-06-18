@@ -73,6 +73,7 @@
 \newcommand{\prm}[1]{\texttt{#1}}
 \newcommand{\fn}[1]{\texttt{#1}}   % function names
 \newcommand{\op}[1]{\texttt{#1}}   % operators / inline code
+\newcommand{\code}[1]{\texttt{#1}} % inline code literals
 
 \begin{document}
 
@@ -292,7 +293,7 @@ summary(HBAT_SEM_rel)
 
 In the summary, we see that we have missing values in the variables AC4 and EP4. 
 Before we can continue we need to use inputation methods or delete incomplete observations. 
-This can be done via following command:
+Deleting incomplete observations can be done via following command:
 
 <<missing-data>>=
 # filter the dataset, only select complete cases
@@ -309,9 +310,9 @@ When using their own data, users must ensure it is stored as a data frame or a m
 \subsection{Model specification}
 In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
-In particular, the \code{=\~} and the \code{<\~} operators are used to define the relations between the constructs and their indicators.
-Specifically, the \code{=~} operator is used to specify reflective measurement models, while the \code{<\~} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
-In addition, the \code{\~} operator is used to specify the relations among constructs.
+In particular, the \code{=\textasciitilde} and the \code{<\~} operators are used to define the relations between the constructs and their indicators.
+Specifically, the \code{=\textasciitilde} operator is used to specify reflective measurement models, while the \code{<\textasciitilde} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
+In addition, the \code{\textasciitilde} operator is used to specify the relations among constructs.
 In case, an observed variable should be directly accounted for in the structural model, it must be specified as a single indicator construct, as common in PLS-PM \citep{}.
 The \pkg{cSEM} specification of the retention model illustrated in Figure \ref{fig:retentionmodel} is as follows:
 
@@ -364,7 +365,8 @@ res_plsc <- csem(
 verify(res_plsc)
 @
 
-The \fn{verify()} function checks whether the PLS algorithm converged, whether all construct reliability estimates~($\rho_\text{A}$) are positive (a necessary condition for the PLSc correction), and whether the model-implied indicator correlation matrix is admissible. If all checks pass, the estimation can be considered successful.
+The \fn{verify()} function checks whether the PLS algorithm converged, whether all construct reliability estimates~($\rho_\text{A}$) are positive (a necessary condition for the PLSc correction), and whether the model-implied indicator correlation matrix is admissible. 
+If all checks pass, the estimation can be considered successful.
 
 To obtain a comprehensive overview of all results, including loadings, path coefficients, reliability measures, and $R^2$ values, use:
 
@@ -396,18 +398,18 @@ Beyond the data and the model, \fn{csem()} exposes a number of optional argument
 The defaults follow the recommendations established in \citep[]{}, so the minimal call already returns appropriate estimates. 
 Users who wish to adjust the PLS algorithm can do so through a set of dedicated arguments, which govern the weighting scheme, the convergence behaviour, and the iteration process: 
 \begin{description}
-  \item[\prm{.conv_criterion}] Character string specifying the criterion used to check for convergence of the weighting algorithm; one of \code{"diff_absolute"}, \code{"diff_squared"}, or \code{"diff_relative"}, with \code{"diff_absolute"} as the default.
+  \item[\prm{.conv\_criterion}] Character string specifying the criterion used to check for convergence of the weighting algorithm; one of \code{"diff\_absolute"}, \code{"diff\_squared"}, or \code{"diff\_relative"}, with \code{"diff\_absolute"} as the default.
   \item[\prm{.disattenuate}]  Logical indicating whether composite (proxy) correlations as well as loadings and path estimates should be disattenuated to yield consistent estimates when at least one construct is modeled as a common factor; defaults to \code{TRUE}.
-  \item[\prm{.dominant_indicators}] A character vector of \code{"construct_name" = "indicator_name"} pairs naming the dominant indicator for a (subset of) construct(s), which fixes the sign/orientation of the corresponding composite; defaults to \code{NULL}.
+  \item[\prm{.dominant\_indicators}] A character vector of \code{"construct\_name" = "indicator\_name"} pairs naming the dominant indicator for a (subset of) construct(s), which fixes the sign/orientation of the corresponding composite; defaults to \code{NULL}.
   \item[\prm{.id}] A character string or integer giving the name or column position of the variable in \code{.data} whose levels are used to split the data into groups for a multigroup analysis; defaults to \code{NULL}.
-  \item[\prm{.iter_max}] Integer giving the maximum number of iterations allowed for the weighting algorithm; with \code{.iter_max = 1} and \code{.approach_weights = "PLS-PM"} one-step weights are returned, and exceeding the maximum returns the weights of the last step with a warning (default \code{100}).
+  \item[\prm{.iter\_max}] Integer giving the maximum number of iterations allowed for the weighting algorithm; with \code{.iter\_max = 1} and \code{.approach\_weights = "PLS-PM"} one-step weights are returned, and exceeding the maximum returns the weights of the last step with a warning (default \code{100}).
   \item[\prm{.normality}]  Logical indicating whether joint normality of the latent variables and error terms should be assumed when estimating a nonlinear model; defaults to \code{FALSE} and is ignored for linear models.
-  \item[\prm{.PLS_approach_cf}] Character string selecting the approach used to obtain the correction factors for PLSc (e.g.\ \code{"dist_squared_euclid"}, \code{"dist_euclid_weighted"}, \code{"fisher_transformed"}, the various means, or \code{"geo_of_harmonic"}); defaults to \code{"dist_squared_euclid"} and is ignored unless disattenuation is applied with PLS-PM.
-  \item[\prm{.PLS_ignore_structural_model}] Logical indicating whether the structural model should be ignored when computing the inner weights of the PLS-PM algorithm; defaults to \code{FALSE} and is ignored for non-PLS-PM weighting approaches.
-  \item[\prm{.PLS_modes}] Specifies the mode used to estimate the weights of each construct in PLS-PM (e.g.\ \code{"modeA"}, \code{"modeB"}, \code{"modeBNNLS"}, \code{"unit"}, \code{"PCA"}, or user-supplied fixed weights), either as a named list per construct or a single value for all; defaults to \code{NULL}, in which case the appropriate mode is chosen automatically from the construct type.
-  \item[\prm{.PLS_weight_scheme_inner}] Character string giving the inner weighting scheme used by PLS-PM; one of \code{"centroid"}, \code{"factorial"}, or \code{"path"}, with \code{"path"} as the default (ignored for non-PLS-PM approaches).
-  \item[\prm{.reliabilities}] A character vector of \code{"name" = value} pairs supplying known reliabilities (between 0 and 1) for a (subset of) construct(s); defaults to \code{NULL}, in which case reliabilities are estimated by \code{csem()} (currently only supported for \code{.approach_weights = "PLS-PM"}).
-  \item[\prm{.starting_values}] A named list of vectors of \code{"indicator_name" = value} pairs giving the (scaled or unscaled) starting indicator weights for the weighting algorithm of selected constructs; defaults to \code{NULL}.
+  \item[\prm{.PLS\_approach\_cf}] Character string selecting the approach used to obtain the correction factors for PLSc (e.g.\ \code{"dist\_squared\_euclid"}, \code{"dist\_euclid\_weighted"}, \code{"fisher\_transformed"}, the various means, or \code{"geo\_of\_harmonic"}); defaults to \code{"dist\_squared\_euclid"} and is ignored unless disattenuation is applied with PLS-PM.
+  \item[\prm{.PLS\_ignore\_structural\_model}] Logical indicating whether the structural model should be ignored when computing the inner weights of the PLS-PM algorithm; defaults to \code{FALSE} and is ignored for non-PLS-PM weighting approaches.
+  \item[\prm{.PLS\_modes}] Specifies the mode used to estimate the weights of each construct in PLS-PM (e.g.\ \code{"modeA"}, \code{"modeB"}, \code{"modeBNNLS"}, \code{"unit"}, \code{"PCA"}, or user-supplied fixed weights), either as a named list per construct or a single value for all; defaults to \code{NULL}, in which case the appropriate mode is chosen automatically from the construct type.
+  \item[\prm{.PLS\_weight\_scheme\_inner}] Character string giving the inner weighting scheme used by PLS-PM; one of \code{"centroid"}, \code{"factorial"}, or \code{"path"}, with \code{"path"} as the default (ignored for non-PLS-PM approaches).
+  \item[\prm{.reliabilities}] A character vector of \code{"name" = value} pairs supplying known reliabilities (between 0 and 1) for a (subset of) construct(s); defaults to \code{NULL}, in which case reliabilities are estimated by \code{csem()} (currently only supported for \code{.approach\_weights = "PLS-PM"}).
+  \item[\prm{.starting\_values}] A named list of vectors of \code{"indicator\_name" = value} pairs giving the (scaled or unscaled) starting indicator weights for the weighting algorithm of selected constructs; defaults to \code{NULL}.
   \item[\prm{.tolerance}] Double giving the tolerance criterion against which the convergence of the weighting algorithm is judged; defaults to \code{1e-05}.
 \end{description}
 
