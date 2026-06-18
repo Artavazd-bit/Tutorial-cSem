@@ -285,19 +285,33 @@ HBAT_SEM_rel <- HBAT_SEM[, c("AC1", "AC2", "AC3", "AC4",
 
 # show dimensions of the relevant dataset
 dim(HBAT_SEM_rel)
+
+# show some basic statistics for all variables in the dataset
+summary(HBAT_SEM_rel)
+@
+
+In the summary, we see that we have missing values in the variables AC4 and EP4. 
+Before we can continue we need to use inputation methods or delete incomplete observations. 
+This can be done via following command:
+
+<<missing-data>>=
+# filter the dataset, only select complete cases
+HBAT_SEM_rel <- HBAT_SEM_rel[complete.cases(HBAT_SEM_rel),]
+
+#  the number of rows changed from 400 to 398 
+dim(HBAT_SEM_rel)
 @
 
 When using their own data, users must ensure it is stored as a data frame or a matrix before passing it to \pkg{cSEM} functions; if necessary, the data can be converted with \fn{as.data.frame()} or \fn{as.matrix()}.
-
 
 %Additional post estimation functions include \fn{assess()} for measurement and structural model quality criteria, \fn{summarize()} for a comprehensive results summary, \fn{infer()} for bootstrap-based inference, \fn{testOMF()} for the overall model fit test, and \fn{predict()} for out-of-sample prediction.
 
 \subsection{Model specification}
 In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
-In particular, the \texttt{=\~} and the \texttt{<\~} operators are used to define the relations between the constructs and their indicators.
-Specifically, the \texttt{=\~} operator is used to specify reflective measurement models, while the \texttt{<\~} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
-In addition, the \texttt{\~} operator is used to specify the relations among constructs.
+In particular, the \code{=\~} and the \code{<\~} operators are used to define the relations between the constructs and their indicators.
+Specifically, the \code{=~} operator is used to specify reflective measurement models, while the \code{<\~} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
+In addition, the \code{\~} operator is used to specify the relations among constructs.
 In case, an observed variable should be directly accounted for in the structural model, it must be specified as a single indicator construct, as common in PLS-PM \citep{}.
 The \pkg{cSEM} specification of the retention model illustrated in Figure \ref{fig:retentionmodel} is as follows:
 
@@ -328,10 +342,11 @@ These arguments include:
 \begin{description}
   \item[\prm{.data}] A data frame or matrix containing the observed indicator variables.
   \item[\prm{.model}] A model string written in \pkg{lavaan} syntax, with \texttt{=\textasciitilde} for measurement relations and \texttt{\textasciitilde} for structural (regression) relations.
-  \item[\prm{.approach\_weights}] The weighting scheme for computing composite scores. Set to \texttt{"PLS-PM"} for PLS-based estimation (the default).
-  \item[\prm{.disattenuate}] Logical. When set to \texttt{TRUE}, \pkg{cSEM} applies the PLSc correction for attenuation, yielding consistent estimates under the common factor model. This is the key switch that distinguishes PLSc-SEM from standard PLS-SEM.
-  \item[\prm{.PLS\_weight\_scheme\_inner}] The inner weighting scheme; options include \texttt{"path"} (default), \texttt{"centroid"}, and \texttt{"factorial"}.
+  %\item[\prm{.approach\_weights}] The weighting scheme for computing composite scores. Set to \texttt{"PLS-PM"} for PLS-based estimation (the default).
+  %\item[\prm{.disattenuate}] Logical. When set to \texttt{TRUE}, \pkg{cSEM} applies the PLSc correction for attenuation, yielding consistent estimates under the common factor model. This is the key switch that distinguishes PLSc-SEM from standard PLS-SEM.
+  %\item[\prm{.PLS\_weight\_scheme\_inner}] The inner weighting scheme; options include \texttt{"path"} (default), \texttt{"centroid"}, and \texttt{"factorial"}.
 \end{description}
+
 
 To ultimately estimate the model using PLSc-SEM, we call \fn{csem()} with \prm{.disattenuate~=~TRUE}. This single argument activates the consistent correction that distinguishes PLSc-SEM from standard PLS-SEM:
 
@@ -375,6 +390,29 @@ res_pls <- csem(
 )
 @
 
+
+\subsection{Adjusting the PLS Algorithm}
+Beyond the data and the model, \fn{csem()} exposes a number of optional arguments.
+The defaults follow the recommendations established in \citep[]{}, so the minimal call already returns appropriate estimates. 
+Users who wish to adjust the PLS algorithm can do so through a set of dedicated arguments, which govern the weighting scheme, the convergence behaviour, and the iteration process: 
+\begin{description}
+  \item[\prm{.conv_criterion}] Character string specifying the criterion used to check for convergence of the weighting algorithm; one of \code{"diff_absolute"}, \code{"diff_squared"}, or \code{"diff_relative"}, with \code{"diff_absolute"} as the default.
+  \item[\prm{.disattenuate}]  Logical indicating whether composite (proxy) correlations as well as loadings and path estimates should be disattenuated to yield consistent estimates when at least one construct is modeled as a common factor; defaults to \code{TRUE}.
+  \item[\prm{.dominant_indicators}] A character vector of \code{"construct_name" = "indicator_name"} pairs naming the dominant indicator for a (subset of) construct(s), which fixes the sign/orientation of the corresponding composite; defaults to \code{NULL}.
+  \item[\prm{.id}] A character string or integer giving the name or column position of the variable in \code{.data} whose levels are used to split the data into groups for a multigroup analysis; defaults to \code{NULL}.
+  \item[\prm{.iter_max}] Integer giving the maximum number of iterations allowed for the weighting algorithm; with \code{.iter_max = 1} and \code{.approach_weights = "PLS-PM"} one-step weights are returned, and exceeding the maximum returns the weights of the last step with a warning (default \code{100}).
+  \item[\prm{.normality}]  Logical indicating whether joint normality of the latent variables and error terms should be assumed when estimating a nonlinear model; defaults to \code{FALSE} and is ignored for linear models.
+  \item[\prm{.PLS_approach_cf}] Character string selecting the approach used to obtain the correction factors for PLSc (e.g.\ \code{"dist_squared_euclid"}, \code{"dist_euclid_weighted"}, \code{"fisher_transformed"}, the various means, or \code{"geo_of_harmonic"}); defaults to \code{"dist_squared_euclid"} and is ignored unless disattenuation is applied with PLS-PM.
+  \item[\prm{.PLS_ignore_structural_model}] Logical indicating whether the structural model should be ignored when computing the inner weights of the PLS-PM algorithm; defaults to \code{FALSE} and is ignored for non-PLS-PM weighting approaches.
+  \item[\prm{.PLS_modes}] Specifies the mode used to estimate the weights of each construct in PLS-PM (e.g.\ \code{"modeA"}, \code{"modeB"}, \code{"modeBNNLS"}, \code{"unit"}, \code{"PCA"}, or user-supplied fixed weights), either as a named list per construct or a single value for all; defaults to \code{NULL}, in which case the appropriate mode is chosen automatically from the construct type.
+  \item[\prm{.PLS_weight_scheme_inner}] Character string giving the inner weighting scheme used by PLS-PM; one of \code{"centroid"}, \code{"factorial"}, or \code{"path"}, with \code{"path"} as the default (ignored for non-PLS-PM approaches).
+  \item[\prm{.reliabilities}] A character vector of \code{"name" = value} pairs supplying known reliabilities (between 0 and 1) for a (subset of) construct(s); defaults to \code{NULL}, in which case reliabilities are estimated by \code{csem()} (currently only supported for \code{.approach_weights = "PLS-PM"}).
+  \item[\prm{.starting_values}] A named list of vectors of \code{"indicator_name" = value} pairs giving the (scaled or unscaled) starting indicator weights for the weighting algorithm of selected constructs; defaults to \code{NULL}.
+  \item[\prm{.tolerance}] Double giving the tolerance criterion against which the convergence of the weighting algorithm is judged; defaults to \code{1e-05}.
+\end{description}
+
+
+
 % ── 3.4 Measurement Model Assessment ─────────────────────────────────
 \subsection{Measurement Model Assessment}
 
@@ -397,43 +435,6 @@ quality$AVE                  # Average variance extracted
 summary_res$Estimates$Loading_estimates
 @
 
-% ── Table 1 ──────────────────────────────────────────────────────────
-% \begin{table}[htbp]
-% \centering
-% \caption{Reflective measurement model assessment results (PLSc-SEM via \pkg{cSEM}).}
-% \label{tab:measurement}
-% \small
-% \begin{tabular}{llccccc}
-% \toprule
-% Construct & Item & Outer loading & Cronbach's $\alpha$ & $\rho_\text{A}$ & $\rho_\text{C}$ & AVE \\
-% \midrule
-% AC & AC1 & 0.770 & 0.894 & 0.911 & 0.926 & 0.679 \\
-%    & AC2 & 0.677 & & & & \\
-%    & AC3 & 0.823 & & & & \\
-%    & AC4 & 0.993 & & & & \\[3pt]
-% EP & EP1 & 0.631 & 0.857 & 0.869 & 0.903 & 0.605 \\
-%    & EP2 & 0.875 & & & & \\
-%    & EP3 & 0.763 & & & & \\
-%    & EP4 & 0.821 & & & & \\[3pt]
-% JS & JS1 & 0.618 & 0.844 & 0.856 & 0.888 & 0.518 \\
-%    & JS2 & 0.696 & & & & \\
-%    & JS3 & 0.715 & & & & \\
-%    & JS4 & 0.628 & & & & \\
-%    & JS5 & 0.903 & & & & \\[3pt]
-% OC & OC1 & 0.427 & 0.832 & 0.887 & 0.886 & 0.573 \\
-%    & OC2 & 0.958 & & & & \\
-%    & OC3 & 0.682 & & & & \\
-%    & OC4 & 0.852 & & & & \\[3pt]
-% SI & SI1 & 0.817 & 0.889 & 0.899 & 0.923 & 0.672 \\
-%    & SI2 & 0.870 & & & & \\
-%    & SI3 & 0.677 & & & & \\
-%    & SI4 & 0.897 & & & & \\
-% \bottomrule
-% \end{tabular}
-
-%\smallskip
-%\footnotesize\textit{Note.} AC = attitudes toward coworkers; EP = environment perceptions; JS = job satisfaction; OC = organizational commitment; SI = staying intentions. Results replicate those in \citet[Table~1]{Cheah2026}.
-%\end{table}
 
 The results in Table~\ref{tab:measurement} indicate that all constructs meet the commonly accepted thresholds. All Cronbach's~$\alpha$ and $\rho_\text{A}$ values exceed 0.70, and all AVE values exceed 0.50, supporting internal consistency reliability and convergent validity. While some outer loadings (e.g., OC1~=~0.427) fall below the recommended threshold of 0.708, these indicators are retained because the corresponding constructs exhibit adequate reliability and AVE, and their retention preserves content validity \citep{Hair2026primer}.
 
