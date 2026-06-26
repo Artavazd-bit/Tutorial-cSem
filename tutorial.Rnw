@@ -310,9 +310,9 @@ When using their own data, users must ensure it is stored as a data frame or a m
 \subsection{Model specification}
 In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
-In particular, the \code{$=\sim$} and the \code{$<\sim$} operators are used to define the relations between the constructs and their indicators.
-Specifically, the \code{$=\sim$} operator is used to specify reflective measurement models, while the \code{$<\sim$} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
-In addition, the \code{$\sim$} operator is used to specify the relations among constructs.
+In particular, the \code{$=~$} and the \code{$<~$} operators are used to define the relations between the constructs and their indicators.
+Specifically, the \code{$=~$} operator is used to specify reflective measurement models, while the \code{$<~$} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
+In addition, the \code{$~$} operator is used to specify the relations among constructs.
 In case, an observed variable should be directly accounted for in the structural model, it must be specified as a single indicator construct, as common in PLS-PM \citep{}.
 The \pkg{cSEM} specification of the retention model illustrated in Figure \ref{fig:retentionmodel} is as follows:
 
@@ -334,12 +334,12 @@ model <- "
 
 
 
-\subsection{PLSc-SEM Estimation}
+\subsection{cSEM Estimation}
 
 The central function is \fn{csem()}.
-The minimal input required for the csem fucntion is a dataset and a model.
-In addition, the csem function shows various arguments that can be used to adjust the PLS algorithm. 
-These arguments include:
+The minimal input required for the csem fucntion is a dataset and a model:
+% In addition, the csem function shows various arguments that can be used to adjust the PLS algorithm. 
+%These arguments include:
 \begin{description}
   \item[\prm{.data}] A data frame or matrix containing the observed indicator variables.
   \item[\prm{.model}] A model string written in \pkg{lavaan} syntax, with \code{$=/sim$} for measurement relations and \texttt{\texttildelow} for structural (regression) relations.
@@ -348,30 +348,29 @@ These arguments include:
   %\item[\prm{.PLS\_weight\_scheme\_inner}] The inner weighting scheme; options include \texttt{"path"} (default), \texttt{"centroid"}, and \texttt{"factorial"}.
 \end{description}
 
-To ultimately estimate the model using PLSc-SEM, we call \fn{csem()} with \prm{.disattenuate~=~TRUE}. This single argument activates the consistent correction that distinguishes PLSc-SEM from standard PLS-SEM:
+To ultimately estimate with the csem function, we call it and save the results as 
 
-<<plsc-est>>=
+<<csem-est>>=
 # PLSc-SEM estimation
-res_plsc <- csem(
+res_csem <- csem(
   .data                    = HBAT_SEM_rel,
-  .model                   = model,
-  .approach_weights        = "PLS-PM",
-  .disattenuate            = TRUE,
-  .PLS_weight_scheme_inner = "path"
+  .model                   = model
 )
 
 # Verify convergence
-verify(res_plsc)
+verify(res_csem)
 @
 
 The \fn{verify()} function checks whether the PLS algorithm converged, whether all construct reliability estimates~($\rho_\text{A}$) are positive (a necessary condition for the PLSc correction), and whether the model-implied indicator correlation matrix is admissible. 
 If all checks pass, the estimation can be considered successful.
 
+
+\subsection{Results Assessment}
 To obtain a comprehensive overview of all results, including loadings, path coefficients, reliability measures, and $R^2$ values, use:
 
-<<summary-res>>=
+<<summary-rescsem>>=
 # Full results summary
-summary_res <- summarize(res_plsc)
+summary_res <- summarize(res_csem)
 print(summary_res)
 
 # For a more compact overview
@@ -379,20 +378,11 @@ summary_res$Estimates$Loading_estimates
 summary_res$Estimates$Path_estimates
 @
 
-For comparison, standard PLS-SEM (without the consistency correction) can be obtained by setting \prm{.disattenuate~=~FALSE}:
-
-<<pls-est>>=
-# Standard PLS-SEM (without correction)
-res_pls <- csem(
-  .data             = HBAT_SEM_rel,
-  .model            = model,
-  .approach_weights = "PLS-PM",
-  .disattenuate     = FALSE
-)
-@
 
 
-\subsection{Adjusting the PLS Algorithm}
+
+
+\section{Adjusting the PLS Algorithm}
 Beyond the data and the model, \fn{csem()} exposes a number of optional arguments.
 The defaults follow the recommendations established in \citep[]{}, so the minimal call already returns appropriate estimates. 
 Users who wish to adjust the PLS algorithm can do so through a set of dedicated arguments, which govern the weighting scheme, the convergence behaviour, and the iteration process: 
@@ -411,6 +401,29 @@ Users who wish to adjust the PLS algorithm can do so through a set of dedicated 
   \item[\prm{.starting\_values}] A named list of vectors of \code{"indicator\_name" = value} pairs giving the (scaled or unscaled) starting indicator weights for the weighting algorithm of selected constructs; defaults to \code{NULL}.
   \item[\prm{.tolerance}] Double giving the tolerance criterion against which the convergence of the weighting algorithm is judged; defaults to \code{1e-05}.
 \end{description}
+
+For comparison, standard PLS-SEM (without the consistency correction) can be obtained by setting \prm{.disattenuate~=~FALSE}:
+
+<<pls-est_not_consistent>>=
+# Standard PLS-SEM (without correction)
+res_pls <- csem(
+  .data             = HBAT_SEM_rel,
+  .model            = model,
+  .approach_weights = "PLS-PM",
+  .disattenuate     = FALSE
+)
+
+# verifying results 
+verify(res_pls)
+
+# show summary
+summary_res_pls <- summarize(res_pls)
+print(summary_res_pls)
+
+summary_res_pls$Estimates$Loading_estimates
+summary_res_pls$Estimates$Path_estimates
+@
+
 
 
 
