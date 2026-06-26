@@ -140,7 +140,7 @@ Keywords: measurement error, bias correction, partial least squares structural e
 \pagenumbering{arabic}
 % \doublespacing
 
-\section*{Introduction}
+\section{Introduction}
 
 Structural equation modeling (SEM) is a versatile multivariate analysis framework used in the behavioral, social, medical, and management sciences to study complex relationships between constructs and their relations with observed variables \citep[e.g.,][]{Marcoulides1996,Kline2023}.
 To estimate structural equation models, various approaches have been proposed, including maximum-likelihood \citep{Joereskog1970}, weighted least squares \citep{Browne1974}, factor score regression \citep{Skrondal2001,Devlieger2017} and (integrated) generalized structured component analysis \citep{Hwang2004,Hwang2021a}
@@ -206,8 +206,8 @@ Section
 % PLS-SEM estimates.
 
 
-\section{cSEM R package Illustration}
-\subsection{First steps in \textsf{R}}
+\section{cSEM R Illustration}
+\subsection{Getting started with R}
 %This section illustrates how to apply PLSc using the \pkg{cSEM} package, starting from the very first steps.
 %It assumes no prior experience with \textsf{R};
 %readers already familiar with \textsf{R} and \textsf{RStudio} may skip directly to Section~\ref{sec:model-data}.
@@ -310,9 +310,9 @@ When using their own data, users must ensure it is stored as a data frame or a m
 \subsection{Model specification}
 In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
-In particular, the \code{$=~$} and the \code{$<~$} operators are used to define the relations between the constructs and their indicators.
-Specifically, the \code{$=~$} operator is used to specify reflective measurement models, while the \code{$<~$} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
-In addition, the \code{$~$} operator is used to specify the relations among constructs.
+In particular, the \code{=~} and the \code{<~} operators are used to define the relations between the constructs and their indicators.
+Specifically, the \code{$=~$} operator is used to specify reflective measurement models, while the \code{<~} is used to specify composite models \citep[see][for an explanation of reflective and composite models]{}.
+In addition, the \code{~} operator is used to specify the relations among constructs.
 In case, an observed variable should be directly accounted for in the structural model, it must be specified as a single indicator construct, as common in PLS-PM \citep{}.
 The \pkg{cSEM} specification of the retention model illustrated in Figure \ref{fig:retentionmodel} is as follows:
 
@@ -334,7 +334,9 @@ model <- "
 
 
 
-\subsection{cSEM Estimation}
+\section{Estimating the model with cSEM}
+
+\subsection{Running the estimation}
 
 The central function is \fn{csem()}.
 The minimal input required for the csem fucntion is a dataset and a model:
@@ -353,8 +355,8 @@ To ultimately estimate with the csem function, we call it and save the results a
 <<csem-est>>=
 # PLSc-SEM estimation
 res_csem <- csem(
-  .data                    = HBAT_SEM_rel,
-  .model                   = model
+  .data  = HBAT_SEM_rel,
+  .model = model
 )
 
 # Verify convergence
@@ -365,7 +367,6 @@ The \fn{verify()} function checks whether the PLS algorithm converged, whether a
 If all checks pass, the estimation can be considered successful.
 
 
-\subsection{Results Assessment}
 To obtain a comprehensive overview of all results, including loadings, path coefficients, reliability measures, and $R^2$ values, use:
 
 <<summary-rescsem>>=
@@ -382,60 +383,16 @@ summary_res$Estimates$Path_estimates
 
 
 
-\section{Adjusting the PLS Algorithm}
-Beyond the data and the model, \fn{csem()} exposes a number of optional arguments.
-The defaults follow the recommendations established in \citep[]{}, so the minimal call already returns appropriate estimates. 
-Users who wish to adjust the PLS algorithm can do so through a set of dedicated arguments, which govern the weighting scheme, the convergence behaviour, and the iteration process: 
-\begin{description}
-  \item[\prm{.conv\_criterion}] Character string specifying the criterion used to check for convergence of the weighting algorithm; one of \code{"diff\_absolute"}, \code{"diff\_squared"}, or \code{"diff\_relative"}, with \code{"diff\_absolute"} as the default.
-  \item[\prm{.disattenuate}]  Logical indicating whether composite (proxy) correlations as well as loadings and path estimates should be disattenuated to yield consistent estimates when at least one construct is modeled as a common factor; defaults to \code{TRUE}.
-  \item[\prm{.dominant\_indicators}] A character vector of \code{"construct\_name" = "indicator\_name"} pairs naming the dominant indicator for a (subset of) construct(s), which fixes the sign/orientation of the corresponding composite; defaults to \code{NULL}.
-  \item[\prm{.id}] A character string or integer giving the name or column position of the variable in \code{.data} whose levels are used to split the data into groups for a multigroup analysis; defaults to \code{NULL}.
-  \item[\prm{.iter\_max}] Integer giving the maximum number of iterations allowed for the weighting algorithm; with \code{.iter\_max = 1} and \code{.approach\_weights = "PLS-PM"} one-step weights are returned, and exceeding the maximum returns the weights of the last step with a warning (default \code{100}).
-  \item[\prm{.normality}]  Logical indicating whether joint normality of the latent variables and error terms should be assumed when estimating a nonlinear model; defaults to \code{FALSE} and is ignored for linear models.
-  \item[\prm{.PLS\_approach\_cf}] Character string selecting the approach used to obtain the correction factors for PLSc (e.g.\ \code{"dist\_squared\_euclid"}, \code{"dist\_euclid\_weighted"}, \code{"fisher\_transformed"}, the various means, or \code{"geo\_of\_harmonic"}); defaults to \code{"dist\_squared\_euclid"} and is ignored unless disattenuation is applied with PLS-PM.
-  \item[\prm{.PLS\_ignore\_structural\_model}] Logical indicating whether the structural model should be ignored when computing the inner weights of the PLS-PM algorithm; defaults to \code{FALSE} and is ignored for non-PLS-PM weighting approaches.
-  \item[\prm{.PLS\_modes}] Specifies the mode used to estimate the weights of each construct in PLS-PM (e.g.\ \code{"modeA"}, \code{"modeB"}, \code{"modeBNNLS"}, \code{"unit"}, \code{"PCA"}, or user-supplied fixed weights), either as a named list per construct or a single value for all; defaults to \code{NULL}, in which case the appropriate mode is chosen automatically from the construct type.
-  \item[\prm{.PLS\_weight\_scheme\_inner}] Character string giving the inner weighting scheme used by PLS-PM; one of \code{"centroid"}, \code{"factorial"}, or \code{"path"}, with \code{"path"} as the default (ignored for non-PLS-PM approaches).
-  \item[\prm{.reliabilities}] A character vector of \code{"name" = value} pairs supplying known reliabilities (between 0 and 1) for a (subset of) construct(s); defaults to \code{NULL}, in which case reliabilities are estimated by \code{csem()} (currently only supported for \code{.approach\_weights = "PLS-PM"}).
-  \item[\prm{.starting\_values}] A named list of vectors of \code{"indicator\_name" = value} pairs giving the (scaled or unscaled) starting indicator weights for the weighting algorithm of selected constructs; defaults to \code{NULL}.
-  \item[\prm{.tolerance}] Double giving the tolerance criterion against which the convergence of the weighting algorithm is judged; defaults to \code{1e-05}.
-\end{description}
-
-For comparison, standard PLS-SEM (without the consistency correction) can be obtained by setting \prm{.disattenuate~=~FALSE}:
-
-<<pls-est_not_consistent>>=
-# Standard PLS-SEM (without correction)
-res_pls <- csem(
-  .data             = HBAT_SEM_rel,
-  .model            = model,
-  .approach_weights = "PLS-PM",
-  .disattenuate     = FALSE
-)
-
-# verifying results 
-verify(res_pls)
-
-# show summary
-summary_res_pls <- summarize(res_pls)
-print(summary_res_pls)
-
-summary_res_pls$Estimates$Loading_estimates
-summary_res_pls$Estimates$Path_estimates
-@
-
-
-
 
 % ── 3.4 Measurement Model Assessment ─────────────────────────────────
-\subsection{Measurement Model Assessment}
+\subsection{Assessing the measurement model}
 
 Following the guidelines described in \citet[Chapter~4]{hair_primer_2017} and \citet{sarstedt_partial_2022}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. 
 The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
 
 <<assess-quality>>=
 # Compute all quality criteria
-quality <- assess(res_plsc)
+quality <- assess(res_csem)
 
 # Internal consistency reliability
 quality$Cronbachs_alpha      # Cronbach's alpha
@@ -463,7 +420,7 @@ quality$HTMT
 
 # Bootstrap confidence intervals for HTMT
 res_plsc_boot <- csem(
-  .data             = hbat_sub,
+  .data             = HBAT_SEM_rel,
   .model            = model,
   .approach_weights = "PLS-PM",
   .disattenuate     = TRUE,
@@ -502,7 +459,7 @@ SI & 0.310 {[0.222; 0.395]} & 0.569 {[0.471; 0.656]} & 0.232 {[0.154; 0.313]} & 
 The HTMT results in Table~\ref{tab:htmt} confirm discriminant validity: none of the upper bounds of the 90\% bootstrap confidence intervals exceed the conservative threshold of 0.85 \citep{Henseler2015, Franke2019}. These findings are identical to those reported by \citet[Table~2]{Cheah2026}, confirming that the \pkg{cSEM} results replicate the SmartPLS output.
 
 % ── 3.5 Structural Model Assessment ──────────────────────────────────
-\subsection{Structural Model Assessment}
+\subsection{Assessing the structural model}
 
 \subsubsection{Collinearity Assessment}
 
@@ -612,8 +569,57 @@ $d_\text{G}$     & 0.303; UB$_{95\%}$: 0.953  & 0.330; UB$_{95\%}$: 0.870 \\
 Consistent with \citet[Table~4]{Cheah2026}, the SRMR of 0.071 falls below the conventional 0.08 threshold \citep{Hu1999}, supporting adequate model fit. The bootstrap-based test yields mixed results: $d_\text{ULS}$ exceeds its critical value (rejecting fit), while $d_\text{G}$ falls below its critical value (supporting fit). Overall, the model exhibits a satisfactory level of fit.
 
 
+\section{Customizing the PLS algorithm}
+Beyond the data and the model, \fn{csem()} exposes a number of optional arguments.
+The defaults follow the recommendations established in \citep[]{}, so the minimal call already returns appropriate estimates.
+Users who wish to adjust the PLS algorithm can do so through a set of dedicated arguments, which govern the weighting scheme, the convergence behaviour, and the iteration process:
+
+\subsection{Customization options}
+\begin{description}
+  \item[\prm{.conv\_criterion}] Character string specifying the criterion used to check for convergence of the weighting algorithm; one of \code{"diff\_absolute"}, \code{"diff\_squared"}, or \code{"diff\_relative"}, with \code{"diff\_absolute"} as the default.
+  \item[\prm{.disattenuate}]  Logical indicating whether composite (proxy) correlations as well as loadings and path estimates should be disattenuated to yield consistent estimates when at least one construct is modeled as a common factor; defaults to \code{TRUE}.
+  \item[\prm{.dominant\_indicators}] A character vector of \code{"construct\_name" = "indicator\_name"} pairs naming the dominant indicator for a (subset of) construct(s), which fixes the sign/orientation of the corresponding composite; defaults to \code{NULL}.
+  \item[\prm{.id}] A character string or integer giving the name or column position of the variable in \code{.data} whose levels are used to split the data into groups for a multigroup analysis; defaults to \code{NULL}.
+  \item[\prm{.iter\_max}] Integer giving the maximum number of iterations allowed for the weighting algorithm; with \code{.iter\_max = 1} and \code{.approach\_weights = "PLS-PM"} one-step weights are returned, and exceeding the maximum returns the weights of the last step with a warning (default \code{100}).
+  \item[\prm{.normality}]  Logical indicating whether joint normality of the latent variables and error terms should be assumed when estimating a nonlinear model; defaults to \code{FALSE} and is ignored for linear models.
+  \item[\prm{.PLS\_approach\_cf}] Character string selecting the approach used to obtain the correction factors for PLSc (e.g.\ \code{"dist\_squared\_euclid"}, \code{"dist\_euclid\_weighted"}, \code{"fisher\_transformed"}, the various means, or \code{"geo\_of\_harmonic"}); defaults to \code{"dist\_squared\_euclid"} and is ignored unless disattenuation is applied with PLS-PM.
+  \item[\prm{.PLS\_ignore\_structural\_model}] Logical indicating whether the structural model should be ignored when computing the inner weights of the PLS-PM algorithm; defaults to \code{FALSE} and is ignored for non-PLS-PM weighting approaches.
+  \item[\prm{.PLS\_modes}] Specifies the mode used to estimate the weights of each construct in PLS-PM (e.g.\ \code{"modeA"}, \code{"modeB"}, \code{"modeBNNLS"}, \code{"unit"}, \code{"PCA"}, or user-supplied fixed weights), either as a named list per construct or a single value for all; defaults to \code{NULL}, in which case the appropriate mode is chosen automatically from the construct type.
+  \item[\prm{.PLS\_weight\_scheme\_inner}] Character string giving the inner weighting scheme used by PLS-PM; one of \code{"centroid"}, \code{"factorial"}, or \code{"path"}, with \code{"path"} as the default (ignored for non-PLS-PM approaches).
+  \item[\prm{.reliabilities}] A character vector of \code{"name" = value} pairs supplying known reliabilities (between 0 and 1) for a (subset of) construct(s); defaults to \code{NULL}, in which case reliabilities are estimated by \code{csem()} (currently only supported for \code{.approach\_weights = "PLS-PM"}).
+  \item[\prm{.starting\_values}] A named list of vectors of \code{"indicator\_name" = value} pairs giving the (scaled or unscaled) starting indicator weights for the weighting algorithm of selected constructs; defaults to \code{NULL}.
+  \item[\prm{.tolerance}] Double giving the tolerance criterion against which the convergence of the weighting algorithm is judged; defaults to \code{1e-05}.
+\end{description}
+
+\subsection{Comparison of different customizations}
+An instructive exercise is to compare PLSc-SEM with standard PLS-SEM to see the effect of the consistency correction. In \pkg{cSEM}, this is achieved simply by toggling \prm{.disattenuate}:
+
+<<compare-plsc-pls>>=
+# Standard PLS-SEM (no correction)
+res_pls <- csem(
+  .data             = hbat_sub,
+  .model            = model,
+  .approach_weights = "PLS-PM",
+  .disattenuate     = FALSE
+)
+
+# Side-by-side comparison
+plsc_est <- summarize(res_plsc)$Estimates$Path_estimates
+pls_est  <- summarize(res_pls)$Estimates$Path_estimates
+
+comparison <- merge(
+  plsc_est[, c("Name", "Estimate")],
+  pls_est[, c("Name", "Estimate")],
+  by = "Name", suffixes = c("_PLSc", "_PLS")
+)
+print(comparison)
+@
+
+As expected from the methodological literature \citep{Dijkstra2015}, the standard PLS-SEM path coefficients are attenuated (biased toward zero) relative to the PLSc-SEM estimates. The attenuation is most visible for paths involving constructs with lower reliability (e.g., OC, which has a relatively low loading for OC1). The PLSc correction recovers the consistent estimates that would be expected under the common factor model.
+
+
 % ══════════════════════════════════════════════════════════════════════
-\section{Comparison with CB-SEM via lavaan}
+\section{Comparing PLS with alternative estimators}
 % ══════════════════════════════════════════════════════════════════════
 
 A key advantage of working in R is the seamless ability to compare PLSc-SEM results with those from CB-SEM using the \pkg{lavaan} package \citep{Rosseel2012}. This allows researchers to conduct the multimethod estimation strategy advocated by \citet{Cheah2026} and \citet{Sarstedt2024} entirely within one script:
@@ -665,40 +671,24 @@ fitMeasures(fit_cbsem, c("chisq", "df", "pvalue", "rmsea",
 In line with the findings of \citet[Figure~4]{Cheah2026}, the CB-SEM and PLSc-SEM path coefficient estimates closely correspond. The CB-SEM model fit indices (RMSEA~=~0.038, SRMR~=~0.060, CFI~=~0.976) confirm good model fit, supporting the conclusions drawn from the PLSc-SEM analysis.
 
 
-% ══════════════════════════════════════════════════════════════════════
-\section{Comparing PLSc-SEM with Standard PLS-SEM}
-% ══════════════════════════════════════════════════════════════════════
-
-An instructive exercise is to compare PLSc-SEM with standard PLS-SEM to see the effect of the consistency correction. In \pkg{cSEM}, this is achieved simply by toggling \prm{.disattenuate}:
-
-<<compare-plsc-pls>>=
-# Standard PLS-SEM (no correction)
-res_pls <- csem(
-  .data             = hbat_sub,
-  .model            = model,
-  .approach_weights = "PLS-PM",
-  .disattenuate     = FALSE
-)
-
-# Side-by-side comparison
-plsc_est <- summarize(res_plsc)$Estimates$Path_estimates
-pls_est  <- summarize(res_pls)$Estimates$Path_estimates
-
-comparison <- merge(
-  plsc_est[, c("Name", "Estimate")],
-  pls_est[, c("Name", "Estimate")],
-  by = "Name", suffixes = c("_PLSc", "_PLS")
-)
-print(comparison)
-@
-
-As expected from the methodological literature \citep{Dijkstra2015}, the standard PLS-SEM path coefficients are attenuated (biased toward zero) relative to the PLSc-SEM estimates. The attenuation is most visible for paths involving constructs with lower reliability (e.g., OC, which has a relatively low loading for OC1). The PLSc correction recovers the consistent estimates that would be expected under the common factor model.
+\section{Further cSEM functionality}
 
 
-% ══════════════════════════════════════════════════════════════════════
-\section{A Compact Reproducible Workflow}
-% ══════════════════════════════════════════════════════════════════════
+\section{Discussion}
 
+This tutorial has demonstrated how to conduct a complete PLSc-SEM analysis using the \pkg{cSEM} package in~R, replicating the employee retention model analysis presented by \citet{Cheah2026} using SmartPLS~4. The results obtained via \pkg{cSEM} are identical to those reported in the SmartPLS-based tutorial, confirming that both software implementations produce consistent estimates.
+
+The \pkg{cSEM} package offers several advantages for researchers seeking a script-based, open-source approach to PLSc-SEM. First, the use of R scripts ensures full reproducibility: every step from data import to final inference is documented in executable code that can be shared, reviewed, and re-run. Second, working within the R ecosystem provides seamless integration with CB-SEM via \pkg{lavaan}, enabling the multimethod estimation strategy advocated by \citet{Cheah2026} and \citet{Sarstedt2024} within a single analytical pipeline. Third, \pkg{cSEM} provides a rich set of postestimation tools---including \fn{testOMF()} for model fit, \fn{predict()} for out-of-sample prediction, and \fn{testMICOM()} for measurement invariance---that support a comprehensive model evaluation workflow.
+
+Several practical considerations warrant mention. Like SmartPLS, \pkg{cSEM} allows toggling between standard PLS-SEM and PLSc-SEM with a single argument (\prm{.disattenuate}), making it straightforward to assess the impact of the consistency correction. Furthermore, \pkg{cSEM} supports additional weighting approaches beyond PLS-PM, including generalized structured component analysis (GSCA) weights and various regression-based approaches, offering flexibility for sensitivity analyses.
+
+However, users should be aware of certain limitations. The PLSc correction requires that all $\rho_\text{A}$ estimates are positive and that the resulting corrected correlation matrix is positive definite. The \fn{verify()} function checks these conditions, but researchers should inspect warning messages carefully, especially with small samples or weakly measured constructs. As \citet{Cheah2026} note, the attenuation correction in PLSc-SEM alters the original PLS-SEM path coefficients, which means that predictive assessment methods such as PLS\textsubscript{predict} \citep{Shmueli2019} are not directly applicable in the PLSc framework.
+
+We hope this tutorial serves as a practical guide for researchers who wish to leverage the strengths of PLSc-SEM within an open-source, reproducible analytical framework. Coupled with the SmartPLS-based tutorial by \citet{Cheah2026}, researchers now have comprehensive guidance for conducting PLSc-SEM analyses across both GUI-based and script-based software environments.
+
+\appendix
+
+\section{A compact reproducible workflow}
 For convenience, we present a compact, self-contained R script that reproduces the complete PLSc-SEM analysis. This script can serve as a template for researchers applying PLSc-SEM with \pkg{cSEM} to their own datasets:
 
 <<compact-workflow>>=
@@ -750,21 +740,6 @@ infer(res_boot)
 testOMF(res, .R = 10000, .seed = 42,
         .handle_inadmissibles = "replace")
 @
-
-
-% ══════════════════════════════════════════════════════════════════════
-\section{Concluding Remarks}
-% ══════════════════════════════════════════════════════════════════════
-
-This tutorial has demonstrated how to conduct a complete PLSc-SEM analysis using the \pkg{cSEM} package in~R, replicating the employee retention model analysis presented by \citet{Cheah2026} using SmartPLS~4. The results obtained via \pkg{cSEM} are identical to those reported in the SmartPLS-based tutorial, confirming that both software implementations produce consistent estimates.
-
-The \pkg{cSEM} package offers several advantages for researchers seeking a script-based, open-source approach to PLSc-SEM. First, the use of R scripts ensures full reproducibility: every step from data import to final inference is documented in executable code that can be shared, reviewed, and re-run. Second, working within the R ecosystem provides seamless integration with CB-SEM via \pkg{lavaan}, enabling the multimethod estimation strategy advocated by \citet{Cheah2026} and \citet{Sarstedt2024} within a single analytical pipeline. Third, \pkg{cSEM} provides a rich set of postestimation tools---including \fn{testOMF()} for model fit, \fn{predict()} for out-of-sample prediction, and \fn{testMICOM()} for measurement invariance---that support a comprehensive model evaluation workflow.
-
-Several practical considerations warrant mention. Like SmartPLS, \pkg{cSEM} allows toggling between standard PLS-SEM and PLSc-SEM with a single argument (\prm{.disattenuate}), making it straightforward to assess the impact of the consistency correction. Furthermore, \pkg{cSEM} supports additional weighting approaches beyond PLS-PM, including generalized structured component analysis (GSCA) weights and various regression-based approaches, offering flexibility for sensitivity analyses.
-
-However, users should be aware of certain limitations. The PLSc correction requires that all $\rho_\text{A}$ estimates are positive and that the resulting corrected correlation matrix is positive definite. The \fn{verify()} function checks these conditions, but researchers should inspect warning messages carefully, especially with small samples or weakly measured constructs. As \citet{Cheah2026} note, the attenuation correction in PLSc-SEM alters the original PLS-SEM path coefficients, which means that predictive assessment methods such as PLS\textsubscript{predict} \citep{Shmueli2019} are not directly applicable in the PLSc framework.
-
-We hope this tutorial serves as a practical guide for researchers who wish to leverage the strengths of PLSc-SEM within an open-source, reproducible analytical framework. Coupled with the SmartPLS-based tutorial by \citet{Cheah2026}, researchers now have comprehensive guidance for conducting PLSc-SEM analyses across both GUI-based and script-based software environments.
 
 \newpage
 
