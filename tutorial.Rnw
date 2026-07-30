@@ -339,18 +339,17 @@ model <- "
 \subsection{Running the estimation}
 
 The central function is \fn{csem()}.
-The minimal input required for the csem fucntion is a dataset and a model:
-% In addition, the csem function shows various arguments that can be used to adjust the PLS algorithm. 
-%These arguments include:
+The minimal input required for the \fn{csem()} function is a dataset and a model:
+
 \begin{description}
-  \item[\prm{.data}] A data frame or matrix containing the observed indicator variables.
-  \item[\prm{.model}] A model string written in \pkg{lavaan} syntax, with \code{=\~} for measurement relations and \texttt{\texttildelow} for structural (regression) relations.
-  %\item[\prm{.approach\_weights}] The weighting scheme for computing composite scores. Set to \texttt{"PLS-PM"} for PLS-based estimation (the default).
-  %\item[\prm{.disattenuate}] Logical. When set to \texttt{TRUE}, \pkg{cSEM} applies the PLSc correction for attenuation, yielding consistent estimates under the common factor model. This is the key switch that distinguishes PLSc-SEM from standard PLS-SEM.
-  %\item[\prm{.PLS\_weight\_scheme\_inner}] The inner weighting scheme; options include \texttt{"path"} (default), \texttt{"centroid"}, and \texttt{"factorial"}.
+  \item[\prm{.data}] A data frame or matrix with column names matching the indicator names used in the model description. 
+  Possible column types of data proved are: "\code{logical}", "\code{numeric}" ("\code{double} or "\code{integer}"), "\code{factor}" ("\code{ordered} and/or "\code{unordered}"), "\code{character}" or a mix of several types.
+  \item[\prm{.model}] A model string written in \pkg{lavaan} syntax, with \code{=\~} for measurement relations and \texttt{\~} for structural (regression) relations.
 \end{description}
 
-To ultimately estimate with the csem function, we call it and save the results as 
+By default weights are estimated using the partial leasts sqaures path modeling algorithm ("PLS-PM"). 
+
+To ultimately estimate with the csem function, we call it and save the results as \code{res_csem}:
 
 <<csem-est>>=
 # PLSc-SEM estimation
@@ -387,7 +386,8 @@ summary_res$Estimates$Path_estimates
 % ── 3.4 Measurement Model Assessment ─────────────────────────────────
 \subsection{Assessing the measurement model}
 
-Following the guidelines described in \citet[Chapter~4]{hair_primer_2017} and \citet{sarstedt_partial_2022}, we assess the reflective measurement model in terms of internal consistency reliability, convergent validity, and discriminant validity. 
+
+The next step involves assessing the measurement model results, according the guidelines described in !!!Benites!!!. 
 The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
 
 <<assess-quality>>=
@@ -395,12 +395,7 @@ The \fn{assess()} function in \pkg{cSEM} provides all relevant quality criteria:
 quality <- assess(res_csem)
 
 # Internal consistency reliability
-quality$Cronbachs_alpha      # Cronbach's alpha
-quality$RhoA                 # Dijkstra-Henseler rho_A
-quality$RhoC                 # Composite reliability (Joreskog rho_C)
-
-# Convergent validity
-quality$AVE                  # Average variance extracted
+quality
 
 # Indicator loadings
 summary_res$Estimates$Loading_estimates
