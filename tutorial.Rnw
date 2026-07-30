@@ -80,7 +80,7 @@
 <<setup, include=FALSE>>=
 library(knitr)
 opts_chunk$set(
-  eval       = TRUE,   # code is displayed, not executed (no data shipped with the paper)
+  eval       = TRUE,   # chunks are executed at knit time; results appear in the document
   echo       = TRUE,
   highlight  = TRUE,
   background = "#F8F8F8",
@@ -349,7 +349,7 @@ The minimal input required for the \fn{csem()} function is a dataset and a model
 
 By default weights are estimated using the partial leasts sqaures path modeling algorithm ("PLS-PM"). 
 
-To ultimately estimate with the csem function, we call it and save the results as \code{res_csem}:
+To ultimately estimate with the csem function, we call it and save the results as \code{res\_csem}:
 
 <<csem-est>>=
 # PLSc-SEM estimation
@@ -414,7 +414,7 @@ Discriminant validity is assessed using the heterotrait-monotrait ratio of corre
 quality$HTMT
 
 # Bootstrap confidence intervals for HTMT
-res_plsc_boot <- csem(
+res_csem_boot <- csem(
   .data             = HBAT_SEM_rel,
   .model            = model,
   .approach_weights = "PLS-PM",
@@ -425,7 +425,7 @@ res_plsc_boot <- csem(
 )
 
 # Extract HTMT inference
-htmt_infer <- infer(res_plsc_boot)
+htmt_infer <- infer(res_csem_boot)
 
 htmt_infer
 # The infer() output includes CIs for all quality criteria
@@ -475,10 +475,10 @@ To evaluate the statistical significance of the structural relationships, we rel
 
 <<path-coef>>=
 # Extract path coefficient estimates
-summarize(res_plsc_boot)$Estimates$Path_estimates
+summarize(res_csem_boot)$Estimates$Path_estimates
 
 # Bootstrap inference for path coefficients
-boot_infer <- infer(res_plsc_boot)
+boot_infer <- infer(res_csem_boot)
 
 # Percentile bootstrap confidence intervals (95%)
 boot_infer$Path_estimates$CI_percentile
@@ -528,7 +528,7 @@ Following \citet{Schuberth2023}, we assess model fit using the \fn{testOMF()} fu
 <<model-fit>>=
 # Overall model fit test
 fit_test <- testOMF(
-  res_plsc,
+  res_csem,
   .R                      = 10000,
   .seed                   = 42,
   .handle_inadmissibles   = "replace"
@@ -594,14 +594,14 @@ An instructive exercise is to compare PLSc-SEM with standard PLS-SEM to see the 
 <<compare-plsc-pls>>=
 # Standard PLS-SEM (no correction)
 res_pls <- csem(
-  .data             = hbat_sub,
+  .data             = HBAT_SEM_rel,
   .model            = model,
   .approach_weights = "PLS-PM",
   .disattenuate     = FALSE
 )
 
 # Side-by-side comparison
-plsc_est <- summarize(res_plsc)$Estimates$Path_estimates
+plsc_est <- summarize(res_csem)$Estimates$Path_estimates
 pls_est  <- summarize(res_pls)$Estimates$Path_estimates
 
 comparison <- merge(
@@ -639,7 +639,7 @@ lavaan_model <- "
   SI ~ JS + OC
 "
 
-fit_cbsem <- sem(lavaan_model, data = hbat_sub)
+fit_cbsem <- sem(lavaan_model, data = HBAT_SEM_rel)
 summary(fit_cbsem, fit.measures = TRUE, standardized = TRUE)
 
 # Extract standardized path coefficients
@@ -652,7 +652,7 @@ The \pkg{lavaan} model specification is identical to the \pkg{cSEM} specificatio
 <<compare-paths>>=
 # Compare structural path coefficients
 # PLSc-SEM
-plsc_paths <- summarize(res_plsc)$Estimates$Path_estimates
+plsc_paths <- summarize(res_csem)$Estimates$Path_estimates
 
 # CB-SEM
 cbsem_paths <- parameterEstimates(fit_cbsem, standardized = TRUE)
@@ -696,11 +696,11 @@ For convenience, we present a compact, self-contained R script that reproduces t
 # 1. Setup ----
 library(cSEM)
 
-hbat <- read.csv("HBAT_Employee_Retention.csv", sep = ";")
+hbat <- read.csv("data/HBAT_SEM.csv", sep = ";")
 vars <- c(paste0("AC", 1:4), paste0("EP", 1:4),
           paste0("JS", 1:5), paste0("OC", 1:4),
           paste0("SI", 1:4))
-dat <- hbat[, vars]
+dat <- hbat[complete.cases(hbat[, vars]), vars]
 
 # 2. Model specification ----
 model <- "
@@ -722,7 +722,7 @@ verify(res)
 
 # 4. Assessment ----
 q <- assess(res)
-q$Cronbachs_alpha; q$RhoA; q$RhoC; q$AVE
+q$Reliability; q$AVE
 q$HTMT; q$VIF; q$F2
 
 # 5. Bootstrap inference ----
