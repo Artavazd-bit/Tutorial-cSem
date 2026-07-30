@@ -74,3 +74,8 @@ tutorial.synctex.gz
 tutorial.tex
 tutorial-concordance.tex
 tutorial.blg
+
+tutorial.bib
+tutorial.aux
+tutorial.bbl
+tutorial.out
