@@ -10,18 +10,19 @@ _Last updated: 2026-07-31 (session with Claude)_
 4. **[after 3.2] Overhaul everything after the main chapter** — discuss further structure and topics (Jason + Florian + Claude) so the paper has enough content for a tutorial: what goes into structural model assessment, customization, comparison with alternative estimators (lavaan/CB-SEM, GSCA, sum scores?), further cSEM functionality (predict(), testMICOM(), MGA, second-order constructs?), discussion. → See Jason's structure proposal in item 7.
 5. **Mention the open-source advantages of cSEM vs. closed-source software somewhere** — currently only touched in the Introduction; needs a proper place (e.g., expanded in Introduction or picked up again in the Discussion).
 6. **Point out that cSEM reports warnings, Cheah/SmartPLS did not** — Cheah et al. report no warnings or similar diagnostics; cSEM surfaces them (e.g., the HTMT warning). Mention this as a difference/advantage in the paper.
-7. **Jason's proposal for the general paper structure (2026-07-31):**
+7. **General paper structure (updated 2026-07-31, assessment now one chapter in Benitez order):**
    1. Introduction
    2. cSEM R Illustration — 2.1 Getting started, 2.2 Model and Data, 2.3 Model specification, 2.4 Estimating the model with cSEM
-   3. Assessment methods in cSEM — 3.1 Assessing the measurement model, 3.2 Assessing the structural model
+   3. Assessment methods in cSEM — one chapter, subsections in Benitez order: validation of the estimation (`verify()`) → testing the adequacy of the model (`testOMF()`: SRMR, d_ULS, d_G) → reliability of the construct scores (ρ_A) → indicator reliability (loadings + significance, bootstrap introduced here) → convergent validity (AVE) → discriminant validity (HTMT) → multicollinearity among indicators → weights (value + significance)
    4. Comparing PLS with alternative estimators
    5. Customization of PLS-PM
-   (Jason's note listed the last point as "8."; later sections — further functionality, discussion — still to be decided with Florian.)
-8. **Restructure follow-ups once the new structure (item 7) is implemented:**
-   - Move `verify()` + explanation again: it currently opens "Customizing the PLS algorithm" as motivation; with customization moving to the end (new Section 5), decide where `verify()` belongs (e.g., after estimation in 2.4) and adapt the transition text.
-   - Roadmap paragraph: now a commented-out blueprint in the Introduction (follows the item-7 structure with placeholder labels `sec:assessment`, `sec:comparison`, `sec:customization`, `sec:further`, `sec:discussion`) — uncomment, adapt wording, and make sure the labels exist once the final structure is in place.
+   (Later sections — further functionality, discussion — still to be decided with Florian. Sections 1–3 are implemented in the .Rnw; 4 and 5 still to be rebuilt.)
+8. **Restructure follow-ups:**
+   - ~~Move `verify()`~~ → resolved: `verify()` now opens the assessment chapter as "validation of the estimation".
+   - Roadmap paragraph: now a commented-out blueprint in the Introduction (placeholder labels `sec:assessment` ✓ exists, `sec:comparison`, `sec:customization`, `sec:further`, `sec:discussion` still missing) — uncomment, adapt wording, and make sure the labels exist once the final structure is in place.
 
-9. **[3.1 Assessing the measurement model] Write the text block explaining the `assess()` output** — figure out how to walk the reader through what `assess()` prints (which quality criteria appear, in what order, what to look at) and write the accompanying explanation text.
+9. **[Sec. "Assessment methods in cSEM"] Write the text blocks for the assessment chapter** — skeleton with chunks and `% TODO (Jason)` markers is in place; write the prose for each step, incl. the part explaining `assess()` (criteria are extracted from `quality` one at a time instead of printing the full output). Open decisions inside the skeleton: multicollinearity step (Mode B VIF not applicable to the all-reflective retention model — show pattern only, or switch one construct to a composite? element name `quality$VIF_modeB` unverified, chunk is `eval=FALSE`) and whether loadings significance is repeated in the weights step per Benitez's composite checklist.
+10. **Look into the `testOMF()` error** — the `test-omf` chunk (bootstrap-based overall model fit test, R=10000, seed 42, `.handle_inadmissibles = "replace"`) throws an error at knit time. Diagnose and fix.
 
 ## Backlog (from earlier session, still open)
 

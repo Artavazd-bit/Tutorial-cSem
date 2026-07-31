@@ -349,34 +349,62 @@ summary_res$Estimates$Path_estimates
 
 Note that the standard errors, $t$-values, and $p$-values in the \fn{summarize()} output are reported as \code{NA}.
 The reason is that a plain \fn{csem()} call computes point estimates only.
-To conduct statistical inference, the standard errors of the estimates must be obtained by a resampling procedure such as the bootstrap, which is introduced in Section~\ref{sec:assmess}.
+To conduct statistical inference, the standard errors of the estimates must be obtained by a resampling procedure such as the bootstrap, which is introduced in Section~\ref{sec:assessment}.
 
-\subsection{Assessing the measuement model}
-\label{sec:assmess}
+\section{\texorpdfstring{Assessment methods in \pkg{cSEM}}{Assessment methods in cSEM}}
+\label{sec:assessment}
 
-The next step involves assessing the measurment model results, according to the guidelines described in \citet{Benitez2020}
+The next step involves assessing the model estimates, according to the guidelines described in \citet{Benitez2020}.
+% TODO (Jason): chapter lead-in — overview of the assessment steps in Benitez order:
+% validation of the estimation -> model adequacy (fit) -> reliability of construct scores
+% -> indicator reliability -> convergent validity -> discriminant validity
+% -> multicollinearity -> weights.
 
+\subsection*{Validation of the estimation}
+
+% TODO (Jason): text — before interpreting any results, ensure the estimation is valid:
+% verify() checks convergence, all rho_A positive (necessary for the PLSc correction),
+% admissible model-implied indicator correlation matrix. If a check fails, results must
+% not be interpreted -> forward pointer to the customization section (algorithm settings).
+
+<<verify>>=
+# Check whether the estimation is admissible
+verify(res_csem)
+@
+
+\subsection*{Testing the adequacy of the model}
+
+% TODO (Jason): text — overall model fit: SRMR, d_ULS (squared Euclidean distance), d_G
+% (geodesic distance); bootstrap-based test comparing empirical and model-implied
+% correlation matrix (testOMF), decision rule via the 95% quantile of the bootstrap
+% distribution.
+
+<<test-omf>>=
+# Bootstrap-based test of the overall model fit
+fit_test <- testOMF(
+  res_csem,
+  .R                    = 1000,
+  .seed                 = 42,
+  .handle_inadmissibles = "replace",
+  .Random.seed = 42
+)
+
+fit_test
+@
+
+\subsection*{Evaluating the reliability of the construct scores}
 
 The \fn{assess()} function computes all relevant quality criteria:
 
-<<assess-qualitiy>>=
+<<assess-quality>>=
 #Compute all quality criteria
 quality <- assess(res_csem)
 @
 
-% TODO (Jason): lead-in text — assessment proceeds indicator -> construct -> between-construct;
-% each criterion is extracted from `quality` in turn instead of printing the full output.
-
-% ── Indicator level: loadings (indicator reliability) ─────────────────
-% TODO (Jason): text — what a loading tells about indicator reliability, threshold 0.708, OC1 case.
-
-<<indicator-loadings>>=
-# Indicator loadings
-summary_res$Estimates$Loading_estimates
-@
-
-% ── Construct level: internal consistency reliability ─────────────────
-% TODO (Jason): text — Cronbach's alpha, rho_A (used by the PLSc correction), rho_C.
+% TODO (Jason): text — instead of printing the full assess() output, each criterion is
+% extracted in turn. Reliability of the construct scores: Dijkstra-Henseler's rho_A
+% (the reliability used by the PLSc correction); alternative estimates (Cronbach's
+% alpha, rho_C) also reported.
 
 <<reliability>>=
 # Internal consistency reliability
@@ -387,7 +415,32 @@ The results indicate that all constructs meet the commonly accepted thresholds.
 All constructs succeed the recommend threshold of $0.707$ for Dijkstra-Henseler $\rho_a$, indicating reliable construct scores.
 Additionnaly \fn{assess()} outputs alternative reliability estimates.
 
-% ── Construct level: convergent validity ──────────────────────────────
+\subsection*{Evaluating indicator reliability}
+
+% TODO (Jason): text — indicator reliability via the factor loading estimates,
+% threshold 0.708 (loading^2 >= 0.5), OC1 case + content-validity argument.
+% Significance of the loadings requires the bootstrap -> this is where the resampling
+% promised in the estimation section is introduced.
+
+<<csem-boot>>=
+# Re-estimate with bootstrap resampling for inference
+res_csem_boot <- csem(
+  .data             = HBAT_SEM_rel,
+  .model            = model,
+  .resample_method  = "bootstrap",
+  .R                = 1000,
+  .seed             = 42
+)
+@
+
+<<loadings-boot>>=
+# Loading estimates incl. bootstrap std. errors, t-values and p-values
+summarize(res_csem_boot)$Estimates$Loading_estimates
+@
+
+\subsection*{Evaluating convergent validity}
+
+% TODO (Jason): text — AVE >= 0.5, relation to indicator loadings.
 
 <<ave>>=
 # Average variance extracted (AVE)
@@ -396,13 +449,42 @@ quality$AVE
 
 The average variance extracted (AVE) for all constructs are above the recommended threshold of $0.5$, supporting convergent validity.
 
-% ── Between constructs: discriminant validity ─────────────────────────
-% TODO (Jason): text — HTMT, thresholds 0.85/0.90, decision via bootstrap CI upper bound
-% -> natural transition to introducing the bootstrap (res_csem_boot).
+\subsection*{Evaluating discriminant validity}
+
+% TODO (Jason): text — HTMT: heterotrait vs. monotrait correlations, thresholds
+% 0.85 (conservative) / 0.90 (liberal); proper decision via the upper bound of the
+% bootstrap confidence interval (res_csem_boot is available at this point).
 
 <<htmt>>=
 # Heterotrait-monotrait ratio of correlations (HTMT)
 quality$HTMT
+@
+
+\subsection*{Assessing multicollinearity among the indicators}
+
+% TODO (Jason/Florian): decide how to present this step — collinearity among indicators
+% concerns composite (Mode B) measurement; in the retention model all constructs are
+% reflective (Mode A), so no Mode B VIF values are computed for this example.
+% Options: state that the check is not applicable here and show the code pattern only,
+% or switch one construct to a composite for illustration.
+% NOTE: element name below (quality$VIF_modeB) still to be verified against the cSEM
+% documentation; chunk is eval=FALSE until this step is settled.
+
+<<vif-indicators, eval = FALSE>>=
+# VIF values for Mode B (composite) weights
+quality$VIF_modeB
+@
+
+\subsection*{Evaluating the weights}
+
+% TODO (Jason): text — weight estimates (value/sign) and their significance from the
+% bootstrap. Note: significance of the loadings is already covered in the indicator
+% reliability step above; decide whether it needs to be repeated here per Benitez's
+% checklist for composites.
+
+<<weights-boot>>=
+# Weight estimates incl. bootstrap std. errors, t-values and p-values
+summarize(res_csem_boot)$Estimates$Weight_estimates
 @
 
 
