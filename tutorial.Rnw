@@ -1,6 +1,7 @@
 % !Rnw weave = knitr
 \documentclass[12pt,a4paper]{article}
 \usepackage[ansinew]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage[english]{babel}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{lmodern}
@@ -79,6 +80,7 @@
 
 <<setup, include=FALSE>>=
 library(knitr)
+Sys.setenv(LANGUAGE = "en")
 opts_chunk$set(
   eval       = TRUE,   # chunks are executed at knit time; results appear in the document
   echo       = TRUE,
@@ -144,9 +146,6 @@ Keywords: measurement error, bias correction, partial least squares structural e
 
 Structural equation modeling (SEM) is a versatile multivariate analysis framework used in the behavioral, social, medical, and management sciences to study complex relationships between constructs and their relations with observed variables \citep[e.g.,][]{Marcoulides1996,Kline2023}.
 To estimate structural equation models, various approaches have been proposed, including maximum-likelihood \citep{Joereskog1970}, weighted least squares \citep{Browne1974}, factor score regression \citep{Skrondal2001,Devlieger2017} and (integrated) generalized structured component analysis \citep{Hwang2004,Hwang2021a}
-% Over recent decades, SEM has developed along two conceptually complementary but methodologically distinct
-% trajectories: factor-based (covariance-based) SEM (CB-SEM; \citealt{Joreskog1978})
-% and composite-based SEM \citep{Wold1974}.
 
 A composite-based estimator to SEM that gained popularity over the last decades in various fields of social sciences \citep{Cook2023}, including marketing \citep{Sarstedt2022a}, information systems research \citep{Benitez2020,Evermann2021}, human resource management \citep{Ringle2020}, and tourism research \citep{Mueller2018}, is partial least squares path modeling \citep[PLS-PM,][]{Wold1982c},also known as partial least squares structural equation modeling \citep[PLS-SEM,][]{Hair2011}.
 PLS-PM is a two-step estimation procedure \citep{Schuberth2023d}.
@@ -170,47 +169,26 @@ For example, their codebase is not openly accessible of transparency \citep{Mori
 Open-source software overcomes these limitations \citep{Barba2022}.
 Therefore, this tutorial presents the R package \pkg{cSEM} as a full-fledged open-source alternative to SmartPLS to apply PLS-PM and PLSc.
 
+% ── Roadmap blueprint ─────────────────────────────────────────────────
+% TODO: uncomment and adapt once the paper structure is final (see TODO.md, items 7/8).
+% Blueprint follows the proposed structure: 2. cSEM R Illustration (incl. estimation),
+% 3. Assessment methods in cSEM, 4. Comparison with alternative estimators,
+% 5. Customization of PLS-PM, then further functionality / discussion (TBD).
+%
+% The remainder of the tutorial is structured as follows.
+% Section~\ref{sec:illustration} shows how to get started with R, introduces the employee retention model and data used for the illustration, and demonstrates how the model is specified and estimated.
+% Section~\ref{sec:assessment} presents the assessment methods in \pkg{cSEM} for the measurement and the structural model.
+% Section~\ref{sec:comparison} compares the PLS results with those of alternative estimators.
+% Section~\ref{sec:customization} presents the options to customize PLS-PM.
+% Section~\ref{sec:further} highlights further functionality of the \pkg{cSEM} package.
+% Finally, Section~\ref{sec:discussion} concludes with a discussion.
+% ──────────────────────────────────────────────────────────────────────
 
-% of open science because they cost money and thus complicate their use for researchers working at institutions with less resources.
-% Similarly, the source code of proprietary software is closed and thus not  open, which turns the software into nontransparent black boxes that hinder the reproducibility of results \citep{Ince2012,Morin2012a},
-% In contrast, the source code of open-source software is open \citep{Barba2022} and thus overcomes these limitations as it is free of charge and the codebase is openly available, thus lowering barriers for collaboration.
-% Therefore, this tutorial presents cSEM as a full-fledged open-source alternative to SmartPLS  to apply PLS-PM and PLSc.
-
-The remainder of the tutorial is structured as follows.
-Section~\ref{sec:illustration} shows how to get started with R, introduces the employee retention model and data used for the illustration, and demonstrates how the model is specified.
-Section~\ref{sec:estimation} covers the estimation of the model with the \fn{csem()} function as well as the assessment of the measurement and the structural model.
-Section~\ref{sec:customization} presents the options to customize the PLS algorithm.
-Section~\ref{sec:comparison} compares the PLSc results with those of alternative estimators.
-Section~\ref{sec:further} highlights further functionality of the \pkg{cSEM} package.
-Finally, Section~\ref{sec:discussion} concludes with a discussion.
-
-
-% \citet{Cheah2026} recently provided a comprehensive SmartPLS~4 tutorial for PLSc-SEM analysis. While SmartPLS offers a user-friendly graphical interface, many researchers---particularly those in quantitative methodology, psychometrics, and data science---prefer script-based, open-source tools for their reproducibility, flexibility, and transparency. The \pkg{cSEM} package \citep{Rademaker2020} for R provides a comprehensive, open-source implementation of composite-based SEM methods, including PLSc-SEM, within a unified and well-documented framework.
-
-
-% Although \textsf{SmartPLS} is the dominant commercial software for PLSc-SEM
-% \citep{Cheah2026}, the \pkg{cSEM} package for \textsf{R}
-% \citep{Rademaker2020} offers a powerful, freely available, open-source
-% alternative. The \pkg{cSEM} package implements PLSc automatically whenever
-% any construct in the model is specified as a common factor using the
-% \op{=\textasciitilde} operator, making the transition from PLS-SEM to
-% PLSc-SEM seamless for \textsf{R} users.
-
-% This tutorial provides a complete, reproducible walkthrough of PLSc-SEM
-% estimation using \pkg{cSEM}, mirroring the structure of \citet{Cheah2026}.
-% We use the same employee retention dataset \citep{HairBlack2019} to ensure
-% direct comparability of results. The tutorial covers package installation,
-% model specification, estimation, measurement model evaluation, and structural
-% model assessment, concluding with a brief comparison of PLSc-SEM and standard
-% PLS-SEM estimates.
 
 
 \section{\texorpdfstring{\pkg{cSEM}}{cSEM} R Illustration}
 \label{sec:illustration}
 \subsection{Getting started with R}
-%This section illustrates how to apply PLSc using the \pkg{cSEM} package, starting from the very first steps.
-%It assumes no prior experience with \textsf{R};
-%readers already familiar with \textsf{R} and \textsf{RStudio} may skip directly to Section~\ref{sec:model-data}.
 
 To use the \pkg{cSEM} package, users first need to install \textsf{R} and an integrated development environment (IDE) such as \textsf{RStudio}.
 For the installation, we refer to the official guides for \textsf{R} (\url{https://cran.r-project.org}) and \textsf{RStudio} (\url{https://posit.co/download/rstudio-desktop}).
@@ -239,7 +217,7 @@ Installation only needs to be done once per machine (rerun this line to update t
 Moreover, development versions can be installed from GitHub: \url{https://github.com/FloSchuberth/cSEM}.
 After installation, the package must be loaded at the start of every new \textsf{R} session before its functions become available:
 
-<<load-csem>>=
+<<load-csem, message=FALSE>>=
 library(cSEM)
 @
 
@@ -250,10 +228,8 @@ With \pkg{cSEM} installed and loaded, we can now import the data and specify the
 \subsection{Model and Data}
 \label{sec:model-data}
 The \pkg{cSEM} package \citep{csem} offers a variety of composite-based approaches to SEM including PLS-PM and PLSc.
-%To illustrate the application of PLSc using cSEM, we use the data and model used in \citet{Cheah2026} to demonstrate SmartPLS.
-%Similarly, we compare the results to those of the maximum-likelihood estimation as implemented in the R package lavaan \citep{Rosseel2012,Rosseel2025}.
 Following \citet{Cheah2026}, our illustration of the application of PLSc using \pkg{cSEM} draws on the employee retention model introduced by \citet[Chapter~13]{Hair2019c}. 
-%Following \citet{Cheah2026}, our illustration draws on the employee retention model introduced by \citet[Chapter~13]{Hair2019c}.
+
 The model explains the effects of organizational commitment~(OC) and job satisfaction~(JS) on employees' staying intentions~(SI), with work environment perceptions~(EP) and attitudes toward coworkers~(AC) as exogenous antecedent constructs.
 Five constructs are reflectively measured by a total of 21 indicators.
 A detailed description of the indicators can be found in \citet{Cheah2026}.
@@ -306,7 +282,6 @@ dim(HBAT_SEM_rel)
 Since two observations contain missing values, all analyses in the remainder of this tutorial are based on the $N = 398$ complete observations.
 When using their own data, users must ensure it is stored as a data frame or a matrix before passing it to \pkg{cSEM} functions; if necessary, the data can be converted with \fn{as.data.frame()} or \fn{as.matrix()}.
 
-
 \subsection{Model specification}
 In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
@@ -331,8 +306,6 @@ model <- "
   SI ~ JS + OC
 "
 @
-
-
 
 \section{Estimating the model with \texorpdfstring{\pkg{cSEM}}{cSEM}}
 \label{sec:estimation}
@@ -362,11 +335,13 @@ res_csem <- csem(
 
 To obtain a comprehensive overview of all results, including loadings, path coefficients, reliability measures, and $R^2$ values, use:
 
-<<summary-rescsem>>=
+<<summary-rescsem,  eval = TRUE, results='hide'>>=
 # Full results summary
 summary_res <- summarize(res_csem)
 print(summary_res)
+@
 
+<<summary-rescsem-compact>>=
 # For a more compact overview
 summary_res$Estimates$Loading_estimates
 summary_res$Estimates$Path_estimates
@@ -374,12 +349,61 @@ summary_res$Estimates$Path_estimates
 
 Note that the standard errors, $t$-values, and $p$-values in the \fn{summarize()} output are reported as \code{NA}.
 The reason is that a plain \fn{csem()} call computes point estimates only.
-To conduct statistical inference, the standard errors of the estimates must be obtained by a resampling procedure such as the bootstrap, which is introduced in Section~\ref{sec:measurement}.
+To conduct statistical inference, the standard errors of the estimates must be obtained by a resampling procedure such as the bootstrap, which is introduced in Section~\ref{sec:assmess}.
+
+\subsection{Assessing the measuement model}
+\label{sec:assmess}
+
+The next step involves assessing the measurment model results, according to the guidelines described in \citet{Benitez2020}
 
 
+The \fn{assess()} function computes all relevant quality criteria:
 
+<<assess-qualitiy>>=
+#Compute all quality criteria
+quality <- assess(res_csem)
+@
 
+% TODO (Jason): lead-in text — assessment proceeds indicator -> construct -> between-construct;
+% each criterion is extracted from `quality` in turn instead of printing the full output.
 
+% ── Indicator level: loadings (indicator reliability) ─────────────────
+% TODO (Jason): text — what a loading tells about indicator reliability, threshold 0.708, OC1 case.
+
+<<indicator-loadings>>=
+# Indicator loadings
+summary_res$Estimates$Loading_estimates
+@
+
+% ── Construct level: internal consistency reliability ─────────────────
+% TODO (Jason): text — Cronbach's alpha, rho_A (used by the PLSc correction), rho_C.
+
+<<reliability>>=
+# Internal consistency reliability
+quality$Reliability
+@
+
+The results indicate that all constructs meet the commonly accepted thresholds.
+All constructs succeed the recommend threshold of $0.707$ for Dijkstra-Henseler $\rho_a$, indicating reliable construct scores.
+Additionnaly \fn{assess()} outputs alternative reliability estimates.
+
+% ── Construct level: convergent validity ──────────────────────────────
+
+<<ave>>=
+# Average variance extracted (AVE)
+quality$AVE
+@
+
+The average variance extracted (AVE) for all constructs are above the recommended threshold of $0.5$, supporting convergent validity.
+
+% ── Between constructs: discriminant validity ─────────────────────────
+% TODO (Jason): text — HTMT, thresholds 0.85/0.90, decision via bootstrap CI upper bound
+% -> natural transition to introducing the bootstrap (res_csem_boot).
+
+<<htmt>>=
+# Heterotrait-monotrait ratio of correlations (HTMT)
+quality$HTMT
+@
 
 
 \newpage
