@@ -355,6 +355,15 @@ To conduct statistical inference, the standard errors of the estimates must be o
 \label{sec:assessment}
 
 The next step involves assessing the model estimates, according to the guidelines described in \citet{Benitez2020}.
+Before any results are interpreted, we first validate the estimation. 
+Second we assess the model adequacy, with $SRMR, d\_{uls}$ and $d\_{G}$.
+Third we subsequently examine the reliability of construct scores, with the Dijkstra--Henseler's $\rho_A$. 
+Fourth we check the factor loading estimates and significance.
+Fifth we assess construct validity, i.e. convergent and discriminant validity \citep{campbell_convergent_1959}. 
+Convergent validity is assed via the average variance extracted $AVE$.
+Discriminant validity is assed with the $HTMT$ and its improved version $HTMT2$.
+Sixth we check for Multicollinearity, via $VIF$.
+Seventh we check the weights and loadings values and significance.
 % TODO (Jason): chapter lead-in — overview of the assessment steps in Benitez order:
 % validation of the estimation -> model adequacy (fit) -> reliability of construct scores
 % -> indicator reliability -> convergent validity -> discriminant validity
@@ -384,9 +393,9 @@ verify(res_csem)
 fit_test <- testOMF(
   res_csem,
   .R                    = 1000,
-  .seed                 = 42,
-  .handle_inadmissibles = "replace",
-  .Random.seed = 42
+  #.seed                 = 42,
+  .handle_inadmissibles = "replace"
+  #.Random.seed = 42
 )
 
 fit_test
