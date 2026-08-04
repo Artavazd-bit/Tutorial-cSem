@@ -357,13 +357,13 @@ To conduct statistical inference, the standard errors of the estimates must be o
 The next step involves assessing the model estimates, according to the guidelines described in \citet{Benitez2020}.
 Before any results are interpreted, we first validate the estimation. 
 Second we assess the model adequacy, with $SRMR, d\_{uls}$ and $d\_{G}$.
-Third we subsequently examine the reliability of construct scores, with the Dijkstra--Henseler's $\rho_A$. 
+Third we subsequently examine the reliability of construct scores, with the Dijkstra--Henseler's $\rho_A$.
 Fourth we check the factor loading estimates and significance.
 Fifth we assess construct validity, i.e. convergent and discriminant validity \citep{campbell_convergent_1959}. 
 Convergent validity is assed via the average variance extracted $AVE$.
 Discriminant validity is assed with the $HTMT$ and its improved version $HTMT2$.
-Sixth we check for Multicollinearity, via $VIF$.
-Seventh we check the weights and loadings values and significance.
+Sixth we check for multicollinearity, via $VIF$.
+Seventh we check the weights and loadings values and their significance.
 % TODO (Jason): chapter lead-in — overview of the assessment steps in Benitez order:
 % validation of the estimation -> model adequacy (fit) -> reliability of construct scores
 % -> indicator reliability -> convergent validity -> discriminant validity
@@ -371,6 +371,15 @@ Seventh we check the weights and loadings values and significance.
 
 \subsection*{Validation of the estimation}
 
+Before we interpret any results, we need to ensure the estimation is valid. 
+This is done with the \fn{verify()} function. 
+This function gives the user details about the estimation. 
+It gives information if convergence is achieved, all absolute standardized loading 
+estimates are smaller or equal than one.
+It also checks of the construct variance covariance matrix is positive semi-definite, if all reliability estimates are smaller or equal than one and if the model-implied indicator variance covarariance matrix is positive semi-definite. 
+It also checks if the construct and the model-implied indicator variance covariance matrix are semi positive definite   and if all reliability estimates are smaller or equal than one.
+If a check fails, the results should not be interpreted and the user needs to customize the algorithm to ensure a valid estimation process. 
+For that check Section \ref{sec:Customization}.
 % TODO (Jason): text — before interpreting any results, ensure the estimation is valid:
 % verify() checks convergence, all rho_A positive (necessary for the PLSc correction),
 % admissible model-implied indicator correlation matrix. If a check fails, results must
@@ -383,6 +392,10 @@ verify(res_csem)
 
 \subsection*{Testing the adequacy of the model}
 
+In this section we test the overall model fit. 
+%For that we examine the $SRMR$, $d_{ULS}$, squared Eucliedean distance, and $d_G$, geodestic distance.
+The function \fn{testOMF()} is a boostrap-based test for model fit originally proposed by \citet{Beran}. 
+See also \citet{DijkstraandHenseler2015} who first suggested the test in the context of PLS-PM. 
 % TODO (Jason): text — overall model fit: SRMR, d_ULS (squared Euclidean distance), d_G
 % (geodesic distance); bootstrap-based test comparing empirical and model-implied
 % correlation matrix (testOMF), decision rule via the 95% quantile of the bootstrap
@@ -390,6 +403,7 @@ verify(res_csem)
 
 <<test-omf>>=
 # Bootstrap-based test of the overall model fit
+set.seed(42)
 fit_test <- testOMF(
   res_csem,
   .R                    = 1000,
@@ -400,6 +414,8 @@ fit_test <- testOMF(
 
 fit_test
 @
+By default \fn{testOMF()} test the null hypothesis that the population indictator correlation matrix equals the population model-implied indicator correlation matrix. 
+\fn{testOMF()} uses different distance measures to assess the distance between the sample indicator correlation matrix and the estimated model-implied indicator correlation matrix, namely the geodesic distance ($d_G$), the squared Euclidean distance $d_{ULS}$ and the root mean square residual $SRMR$.
 
 \subsection*{Evaluating the reliability of the construct scores}
 
@@ -410,19 +426,32 @@ The \fn{assess()} function computes all relevant quality criteria:
 quality <- assess(res_csem)
 @
 
-% TODO (Jason): text — instead of printing the full assess() output, each criterion is
-% extracted in turn. Reliability of the construct scores: Dijkstra-Henseler's rho_A
-% (the reliability used by the PLSc correction); alternative estimates (Cronbach's
-% alpha, rho_C) also reported.
-
-<<reliability>>=
-# Internal consistency reliability
+<<assess-rho-A>>=
+#Show Dijkstras and Henselers rho A
 quality$Reliability
 @
 
 The results indicate that all constructs meet the commonly accepted thresholds.
 All constructs succeed the recommend threshold of $0.707$ for Dijkstra-Henseler $\rho_a$, indicating reliable construct scores.
 Additionnaly \fn{assess()} outputs alternative reliability estimates.
+  
+<<assess-cronbach-alpha>>=
+# Show cronbach alpha
+quality$Reliability
+@  
+
+<<assess-rho_C>>=
+# Show rho_C
+quality$RhoC
+quality$RhoC_mm
+quality$RhoC_weighted
+quality$RhoC_weighted_mm
+@  
+
+% TODO (Jason): text — instead of printing the full assess() output, each criterion is
+% extracted in turn. Reliability of the construct scores: Dijkstra-Henseler's rho_A
+% (the reliability used by the PLSc correction); alternative estimates (Cronbach's
+% alpha, rho_C) also reported.
 
 \subsection*{Evaluating indicator reliability}
 
