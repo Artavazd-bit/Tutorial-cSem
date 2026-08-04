@@ -390,6 +390,7 @@ For that check Section \ref{sec:Customization}.
 verify(res_csem)
 @
 
+
 \subsection*{Testing the adequacy of the model}
 
 In this section we test the overall model fit. 
@@ -424,6 +425,11 @@ The \fn{assess()} function computes all relevant quality criteria:
 <<assess-quality>>=
 #Compute all quality criteria
 quality <- assess(res_csem)
+@
+
+<<assess-with-inference>>=
+quality_inf <- assess(.object = res_csem, 
+                      .inference = TRUE)
 @
 
 <<assess-rho-A>>=
@@ -488,6 +494,13 @@ quality$AVE
 The average variance extracted (AVE) for all constructs are above the recommended threshold of $0.5$, supporting convergent validity.
 
 \subsection*{Evaluating discriminant validity}
+To assess discriminant validity users can utilize the HTMT \citep{Henseler2015} which is calculated with the default options within the \fn{assess()} function.
+There are several ways on testing for discriminant validity. 
+One can compare the HTMT with a threshold, common values are 0.85 and 0.9 \citep{Henseler2015}.
+Or we can do inference by calculating the confidence interval bounds and comparing the upper limit with one.
+For that the \prm{.inference} needs to be set on \code{TRUE}. 
+If one is bigger than the upper limit then discriminant validity is established.
+
 
 % TODO (Jason): text — HTMT: heterotrait vs. monotrait correlations, thresholds
 % 0.85 (conservative) / 0.90 (liberal); proper decision via the upper bound of the
@@ -497,6 +510,11 @@ The average variance extracted (AVE) for all constructs are above the recommende
 # Heterotrait-monotrait ratio of correlations (HTMT)
 quality$HTMT
 @
+
+<<htmt-inference>>=
+quality_inf$HTMT
+@
+
 
 \subsection*{Assessing multicollinearity among the indicators}
 
