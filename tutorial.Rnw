@@ -360,6 +360,7 @@ Second we assess the model adequacy, with $SRMR, d\_{uls}$ and $d\_{G}$.
 Third we subsequently examine the reliability of construct scores, with the Dijkstra--Henseler's $\rho_A$.
 Fourth we check the factor loading estimates and significance.
 Fifth we assess construct validity, i.e. convergent and discriminant validity \citep{campbell_convergent_1959}. 
+
 Convergent validity is assed via the average variance extracted $AVE$.
 Discriminant validity is assed with the $HTMT$ and its improved version $HTMT2$.
 Sixth we check for multicollinearity, via $VIF$.
@@ -427,10 +428,6 @@ The \fn{assess()} function computes all relevant quality criteria:
 quality <- assess(res_csem)
 @
 
-<<assess-with-inference>>=
-quality_inf <- assess(.object = res_csem, 
-                      .inference = TRUE)
-@
 
 <<assess-rho-A>>=
 #Show Dijkstras and Henselers rho A
@@ -511,7 +508,11 @@ If one is bigger than the upper limit then discriminant validity is established.
 quality$HTMT
 @
 
+
 <<htmt-inference>>=
+quality_inf <- assess(.object = res_csem, 
+                      .inference = TRUE, 
+                      .absolute = FALSE)
 quality_inf$HTMT
 @
 
