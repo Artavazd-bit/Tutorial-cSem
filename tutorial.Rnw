@@ -492,10 +492,10 @@ The average variance extracted (AVE) for all constructs are above the recommende
 
 \subsection*{Evaluating discriminant validity}
 To assess discriminant validity users can utilize the HTMT \citep{Henseler2015} which is calculated with the default options within the \fn{assess()} function.
-There are several ways on testing for discriminant validity. 
+There are several ways on testing for discriminant validity with the HTMT.
 One can compare the HTMT with a threshold, common values are 0.85 and 0.9 \citep{Henseler2015}.
 Or we can do inference by calculating the confidence interval bounds and comparing the upper limit with one.
-For that the \prm{.inference} needs to be set on \code{TRUE}. 
+For that the \prm{.inference} needs to be set on \code{TRUE}.
 If one is bigger than the upper limit then discriminant validity is established.
 
 
