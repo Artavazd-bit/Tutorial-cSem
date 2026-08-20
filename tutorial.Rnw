@@ -517,7 +517,7 @@ quality_inf$HTMT
 @
 
 
-\subsection*{Assessing multicollinearity among the indicators}
+\subsection*{Assessing multicollinearity among the indicators and Evaluating the weights}
 
 % TODO (Jason/Florian): decide how to present this step — collinearity among indicators
 % concerns composite (Mode B) measurement; in the retention model all constructs are
@@ -532,7 +532,9 @@ quality_inf$HTMT
 quality$VIF_modeB
 @
 
-\subsection*{Evaluating the weights}
+%\subsection*{Evaluating the weights}
+% braucht man das wirklich???
+
 
 % TODO (Jason): text — weight estimates (value/sign) and their significance from the
 % bootstrap. Note: significance of the loadings is already covered in the indicator
