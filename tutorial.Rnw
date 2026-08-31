@@ -119,6 +119,17 @@ local({
     hook_output(x, options)
   })
 })
+
+# Warning hook: keep knitr's warning color, but typeset warnings like normal
+# output (verbatim block inside the chunk box) instead of a wrapped text
+# paragraph; lines longer than the 80-character output width are wrapped.
+knit_hooks$set(warning = function(x, options) {
+  x <- gsub("\n*$", "", x)
+  x <- paste(unlist(lapply(strsplit(x, "\n")[[1]], strwrap, width = 80)),
+             collapse = "\n")
+  paste0("\\begingroup\\color{warningcolor}\\begin{verbatim}\n",
+         x, "\n\\end{verbatim}\\endgroup")
+})
 @
 
 \pagenumbering{gobble}
@@ -385,7 +396,7 @@ To conduct statistical inference, the standard errors of the estimates must be o
 The next step involves assessing the model estimates, according to the guidelines described in \citet{Benitez2020}.
 The first step involves testing for overall model fit. 
 The second step addresses the assessment of the reflective measurement models. 
-The third step evaluates the Structural model. 
+The third step evaluates the structural model.
 
 \subsection{Overall model fit}
 \label{sec:overall-fit}
@@ -396,10 +407,9 @@ This is done with the \fn{verify()} function.
 This function gives the user details about the estimation. 
 It gives information if convergence is achieved, all absolute standardized loading 
 estimates are smaller or equal than one.
-It also checks of the construct variance covariance matrix is positive semi-definite, if all reliability estimates are smaller or equal than one and if the model-implied indicator variance covarariance matrix is positive semi-definite. 
-It also checks if the construct and the model-implied indicator variance covariance matrix are semi positive definite and if all reliability estimates are smaller or equal than one.
+It also checks whether the construct variance covariance matrix is positive semi-definite, if all reliability estimates are smaller or equal than one and if the model-implied indicator variance covariance matrix is positive semi-definite.
 If a check fails, the results should not be interpreted and the user needs to customize the algorithm to ensure a valid estimation process.
-For that check Section \ref{sec:Customization}.
+For that check Section \ref{sec:customization}.
 <<verify>>=
 # Check whether the estimation is admissible
 verify(res_csem)
@@ -408,9 +418,9 @@ verify(res_csem)
 
 After that we can examine the overall model fit with the function \fn{testOMF()}. 
 %For that we examine the $SRMR$, $d_{ULS}$, squared Eucliedean distance, and $d_G$, geodestic distance.
-The function \fn{testOMF()} is a boostrap-based test for model fit originally proposed by \citet{Beran}. 
-See also \citet{DijkstraandHenseler2015} who first suggested the test in the context of PLS-PM.
-It outputs various overall model fit indices, such as the $d\_G$, $SRMR$:
+The function \fn{testOMF()} is a bootstrap-based test for model fit originally proposed by \citet{Beran1985}.
+See also \citet{Dijkstra2015} who first suggested the test in the context of PLS-PM.
+It outputs various overall model fit indices, such as the $d_G$, $SRMR$:
 <<test-omf>>=
 # Bootstrap-based test of the overall model fit
 fit_test <- testOMF(
@@ -422,43 +432,31 @@ fit_test <- testOMF(
 
 fit_test
 @
-By default \fn{testOMF()} test the null hypothesis that the population indicator correlation matrix equals the population model-implied indicator correlation matrix. 
-\fn{testOMF()} uses different distance measures to assess the distance between the sample indicator correlation matrix and the estimated model-implied indicator correlation matrix, namely the geodesic distance ($d_G$), the squared Euclidean distance $d_{ULS}$ and the root mean square residual $SRMR$.
+By default \fn{testOMF()} tests the null hypothesis that the population indicator correlation matrix equals the population model-implied indicator correlation matrix. 
+\fn{testOMF()} uses different distance measures to assess the distance between the sample indicator correlation matrix and the estimated model-implied indicator correlation matrix, namely the geodesic distance ($d_G$), the squared Euclidean distance $d_{ULS}$ and the standardized root mean square residual $SRMR$.
 
 \subsection{Assessment of the reflective measurement models}
 \label{sec:measurement}
 
+The \fn{assess()} function computes all relevant quality criteria.
+The output shows all criteria grouped in titled sections. 
+The output here is shortened for presentation, the "\dots" mark omitted lines, running the code yields the full report.
 
-
-\subsubsection*{Evaluating the reliability of the construct scores}
-
-The \fn{assess()} function computes all relevant quality criteria
-
-<<assess-quality, excerpt.lines = 5>>=
+<<assess-quality, excerpt.lines = 5, warning = FALSE>>=
 #Compute all quality criteria
-quality <- assess(res_csem, .inference = "asymptotic")
+quality <- assess(res_csem)
 quality
 @
 
-% TODO (Jason): text — one or two sentences on the output above: printing `quality`
-% shows all criteria grouped in titled sections; the output here is shortened for
-% presentation ("..." marks omitted lines), running the code yields the full report.
-% In the following, the criteria are extracted from `quality` one at a time.
+In the following, the criteria of \fn{assess()} are extracted one at a time.
 
+\subsubsection*{Evaluating the reliability of the construct scores}
 
 <<assess-rho-A>>=
 #Show Dijkstras and Henselers rho A
 quality$Reliability
 @
 
-The results indicate that all constructs meet the commonly accepted thresholds.
-All constructs succeed the recommend threshold of $0.707$ for Dijkstra-Henseler $\rho_a$, indicating reliable construct scores.
-Additionnaly \fn{assess()} outputs alternative reliability estimates.
-  
-<<assess-cronbach-alpha>>=
-# Show cronbach alpha
-quality$Reliability
-@  
 
 <<assess-rho_C>>=
 # Show rho_C
@@ -468,19 +466,15 @@ quality$RhoC_weighted
 quality$RhoC_weighted_mm
 @  
 
-% TODO (Jason): text — instead of printing the full assess() output, each criterion is
-% extracted in turn. Reliability of the construct scores: Dijkstra-Henseler's rho_A
-% (the reliability used by the PLSc correction); alternative estimates (Cronbach's
-% alpha, rho_C) also reported.
 
 \subsubsection*{Evaluating indicator reliability}
 
-% TODO (Jason): text — indicator reliability via the factor loading estimates,
-% threshold 0.708 (loading^2 >= 0.5), OC1 case + content-validity argument.
-% Significance of the loadings requires the bootstrap -> this is where the resampling
-% promised in the estimation section is introduced.
+% TODO (Jason): text — indicator reliability can be assessed via the factor loading
+% estimates. Significance of the loadings requires the bootstrap -> this is where the
+% resampling promised in the estimation section is introduced.
+% (Style decision 2026-08-31: describe what can be done, no thresholds/decision rules.)
 
-<<csem-boot>>=
+<<csem-boot, warning = FALSE>>=
 # Re-estimate with bootstrap resampling for inference
 res_csem_boot <- csem(
   .data             = HBAT_SEM_rel,
@@ -498,39 +492,42 @@ summarize(res_csem_boot)$Estimates$Loading_estimates
 
 \subsubsection*{Evaluating convergent validity}
 
-% TODO (Jason): text — AVE >= 0.5, relation to indicator loadings.
+% TODO (Jason): text — convergent validity can be assessed via the AVE; relation to
+% the indicator loadings. (No thresholds — describe what can be done.)
 
 <<ave>>=
 # Average variance extracted (AVE)
 quality$AVE
 @
 
-The average variance extracted (AVE) for all constructs are above the recommended threshold of $0.5$, supporting convergent validity.
+The average variance extracted (AVE) for all constructs is above the recommended threshold of $0.5$, supporting convergent validity.
 
 \subsubsection*{Evaluating discriminant validity}
-To assess discriminant validity users can utilize the HTMT \citep{Henseler2015} which is calculated with the default options within the \fn{assess()} function.
-There are several ways on testing for discriminant validity with the HTMT.
-One can compare the HTMT with a threshold, common values are 0.85 and 0.9 \citep{Henseler2015}.
-Or we can do inference by calculating the confidence interval bounds and comparing the upper limit with one.
-For that the \prm{.inference} needs to be set on \code{TRUE}.
-If one is bigger than the upper limit then discriminant validity is established.
+The \pkg{cSEM} package uses the HTMT and its improved version HTMT2 to assess discriminant validity.
+Both are calculated with the default options within the \fn{assess()} function.
+If the user wants to do inference the \prm{.inference} parameter can be set to "bootstrap" or "asymptotic" then the associated confidence intervals are being calculated.
+While doing inference it is recommended to set \prm{.absolute} to FALSE. 
+If one is bigger than the upper limit then discriminant validity is seen as established.
 
-
-% TODO (Jason): text — HTMT: heterotrait vs. monotrait correlations, thresholds
-% 0.85 (conservative) / 0.90 (liberal); proper decision via the upper bound of the
-% bootstrap confidence interval (res_csem_boot is available at this point).
-
-<<htmt>>=
+<<htmt, warning = TRUE>>=
 # Heterotrait-monotrait ratio of correlations (HTMT)
-quality$HTMT
+HTMT <- assess(res_csem, 
+               .quality_criterion = "htmt", 
+               .inference = "asymptotic", 
+               .absolute = FALSE)
+HTMT
 @
 
+The warning message says that some of the correlations between the indicators have different signs.
+This does not lead to any calculation issues.
 
-<<htmt-inference>>=
-quality_inf <- assess(.object = res_csem, 
-                      .inference = TRUE, 
-                      .absolute = FALSE)
-quality_inf$HTMT
+The improved version HTMT2 and its inference can be calculated via bootstrap confidence intervals. 
+<<htmt2, warning = TRUE>>=
+# Heterotrai-monotrait ratio 2 of correlations (HTMT2)
+HTMT2 <- assess(res_csem,
+                .qualitiy_criterion = "htmt2",
+                .inference = "bootstrap",
+                .absolute = FALSE)
 @
 
 
@@ -575,8 +572,8 @@ summarize(res_csem_boot)$Estimates$Weight_estimates
 summarize(res_csem_boot)$Estimates$Path_estimates
 @
 
-% TODO (Jason): text — effect sizes f^2: change in R^2 when a predictor is omitted;
-% common benchmarks 0.02 / 0.15 / 0.35 (small / medium / large).
+% TODO (Jason): text — effect sizes f^2: change in R^2 when a predictor is omitted.
+% (No benchmarks — describe what can be done.)
 
 <<effect-sizes>>=
 # Effect sizes (f^2)
@@ -593,12 +590,15 @@ quality$R2_adj
 @
 
 
-\section{Further features of CSEM}
+\section{Further features of \texorpdfstring{\pkg{cSEM}}{cSEM}}
+\label{sec:further}
 \subsection{Customization of PLS-PM}
+\label{sec:customization}
 \subsection{predictive model assessment}
 \subsection{non linear}
 
 \section{Concluding remarks}
+\label{sec:discussion}
 
 \newpage
 
