@@ -1,29 +1,37 @@
 # TODO — cSEM Tutorial Paper
 
-_Last updated: 2026-08-18 (session with Claude). Note: `tutorial.Rnw` was edited 2026-08-10 (testOMF explanation, AVE sentence, HTMT lead-in written; `htmt-inference` chunk added — currently the crashing full-criteria call, see items 15/16)._
+_Last updated: 2026-08-31 (session with Claude; full .Rnw ↔ TODO reconciliation done same day). cSEM is now installed from GitHub master (FloSchuberth/cSEM): testOMF fix confirmed working, HTMT2 NaN-crash fixed — but the HTMT2 value itself stays NaN (data-driven, see item 15). Assessment chapter restructured 2026-08-31 into three subchapters (see item 7); all item-16 target strings confirmed still present, batch still applies cleanly._
 
 ## Open
 
 1. **[3.2] `assess()` warning message (HTMT)** — "Intra-block and inter-block correlations … all-positive or all-negative". Jason has a fix in another repo → **open a pull request to FloSchuberth/cSEM and get it merged** (reminder for Jason!). Until merged, the knitted PDF shows the warning.
-3. **Generate Table `tab:structural` from R instead of hard-coding** — for when the structural-model section is rebuilt (item 4; the old hand-typed table was removed in the restructure). Hidden chunk (`echo=FALSE, results='asis'`) that builds the LaTeX via `cat()`/`sprintf()` from `summarize(res_csem_boot)` (Estimate, SD, t, p, 95% percentile CI per path) plus `quality$VIF` / `quality$F2` for the diagnostics columns, incl. a *Note* line. Verify against Cheah et al.'s published tables (ground truth). Same pattern later for `tab:htmt` and `tab:fit`. (Claude drafted a chunk pattern for this on 2026-08-04.)
+3. **Generate Table `tab:structural` from R instead of hard-coding** — the structural section now exists as subchapter 3.3 (2026-08-31) with raw-output chunks (`paths-boot`, `effect-sizes`, `r-squared`); the R-generated table would replace/complement those. Hidden chunk (`echo=FALSE, results='asis'`) that builds the LaTeX via `cat()`/`sprintf()` from `summarize(res_csem_boot)` (Estimate, SD, t, p, 95% percentile CI per path) plus `quality$VIF` / `quality$F2` for the diagnostics columns, incl. a *Note* line. Verify against Cheah et al.'s published tables (ground truth). Same pattern later for `tab:htmt` and `tab:fit`. (Claude drafted a chunk pattern for this on 2026-08-04.)
 4. **[after 3.2] Overhaul everything after the main chapter** — discuss further structure and topics (Jason + Florian + Claude) so the paper has enough content for a tutorial: what goes into structural model assessment, customization, comparison with alternative estimators (lavaan/CB-SEM, GSCA, sum scores?), further cSEM functionality (predict(), testMICOM(), MGA, second-order constructs?), discussion. → See Jason's structure proposal in item 7.
-5. **Mention the open-source advantages of cSEM vs. closed-source software somewhere** — currently only touched in the Introduction; needs a proper place (e.g., expanded in Introduction or picked up again in the Discussion).
+5. **Mention the open-source advantages of cSEM vs. closed-source software somewhere** — _update 2026-08-31: the Introduction now has a full passage (~lines 160–170: proprietary vs. open-source, open-science principles, transparency/reproducibility citations)._ Remaining: pick it up again in the Discussion once that section exists (item 4); one empty `\citep{}` in the passage (accessibility/inclusiveness claim, see Backlog).
 6. **Point out that cSEM reports warnings, Cheah/SmartPLS did not** — Cheah et al. report no warnings or similar diagnostics; cSEM surfaces them (e.g., the HTMT warning). Mention this as a difference/advantage in the paper.
 7. **General paper structure (updated 2026-07-31, assessment now one chapter in Benitez order):**
-   1. Introduction
+   1. Introduction und 
    2. cSEM R Illustration — 2.1 Getting started, 2.2 Model and Data, 2.3 Model specification, 2.4 Estimating the model with cSEM
-   3. Assessment methods in cSEM — one chapter, subsections in Benitez order: validation of the estimation (`verify()`) → testing the adequacy of the model (`testOMF()`: SRMR, d_ULS, d_G) → reliability of the construct scores (ρ_A) → indicator reliability (loadings + significance, bootstrap introduced here) → convergent validity (AVE) → discriminant validity (HTMT) → multicollinearity among indicators → weights (value + significance)
+   3. Assessment Methods — restructured 2026-08-31 into three numbered subchapters (chapter renamed from "Assessment methods in cSEM"):
+      - Chapter opener (unnumbered): validation of the estimation (`verify()`) — placement = Claude's choice, Jason may veto
+      - 3.1 Overall model fit (`testOMF()`: SRMR, d_ULS, d_G)
+      - 3.2 Assessment of the reflective measurement models (renamed by Jason 2026-08-31, "and composite models" dropped) — the previous steps as unnumbered `\subsubsection*`: reliability of construct scores (ρ_A) → indicator reliability (loadings + significance, bootstrap introduced here) → convergent validity (AVE) → discriminant validity (HTMT) → multicollinearity among indicators + weights
+      - 3.3 Structural model evaluation — new skeleton (chunks `paths-boot`, `effect-sizes`, `r-squared`; element names `Path_estimates`, `quality$F2`, `quality$R2`, `quality$R2_adj` verified live 2026-08-31) with `% TODO (Jason)` text markers
    4. Comparing PLS with alternative estimators
-   5. Customization of PLS-PM
+   5. Further features of cSEM (some ideas) 
+	5.1 Customization of PLS-PM
+	5.2 predictive model assessment
+	5.3 non linear
+	5.4 IMAP mediation 
+	5.5 multi group
    (Later sections — further functionality, discussion — still to be decided with Florian. Sections 1–3 are implemented in the .Rnw; 4 and 5 still to be rebuilt.)
 8. **Restructure follow-ups:**
    - ~~Move `verify()`~~ → resolved: `verify()` now opens the assessment chapter as "validation of the estimation".
-   - Roadmap paragraph: now a commented-out blueprint in the Introduction (placeholder labels `sec:assessment` ✓ exists, `sec:comparison`, `sec:customization`, `sec:further`, `sec:discussion` still missing) — uncomment, adapt wording, and make sure the labels exist once the final structure is in place.
+   - Roadmap paragraph: still a commented-out blueprint in the Introduction (~lines 172–185). Label status 2026-08-31: `sec:illustration` ✓, `sec:estimation` ✓, `sec:assessment` ✓ (+ new `sec:overall-fit`, `sec:measurement`, `sec:structural`); `sec:comparison`, `sec:customization`, `sec:further`, `sec:discussion` still missing — uncomment, adapt wording, and make sure the labels exist once the final structure is in place.
+   - **Section-level mismatch (found 2026-08-31):** "Estimating the model with cSEM" is a top-level `\section` (own chapter, `sec:estimation`), but the planned structure (item 7) has it as subsection 2.4 inside the Illustration chapter — the roadmap blueprint also assumes that. Decide: demote to `\subsection` or keep as own chapter and adapt item 7 + roadmap.
 
-9. **[Sec. "Assessment methods in cSEM"] Write the text blocks for the assessment chapter** — skeleton with chunks and `% TODO (Jason)` markers is in place; write the prose for each step, incl. the part explaining `assess()` (criteria are extracted from `quality` one at a time instead of printing the full output). _Progress 2026-08-04: chapter lead-in, verify(), testOMF, construct-score reliability, and discriminant validity (HTMT thresholds + CI decision rule) are written; still to write: testOMF decision rule (95% quantile), indicator reliability, AVE, weights._ Open decisions inside the skeleton: multicollinearity step (Mode B VIF not applicable to the all-reflective retention model — show pattern only, or switch one construct to a composite? element name `quality$VIF_modeB` unverified, chunk is `eval=FALSE`) and whether loadings significance is repeated in the weights step per Benitez's composite checklist.
-10. **Look into the `testOMF()` error** — the `test-omf` chunk throws an error at knit time. Fix PR opened to FloSchuberth/cSEM (2026-08-04) → wait for merge, then restore `.seed = 42` (currently commented out) and re-knit to confirm. Chunk is currently R=1000. Until the merge, the `set.seed(42)` workaround before the call stands.
-
-_Items 11–14: from Claude's review of the assessment section (2026-08-04)._
+9. **[Sec. "Assessment Methods"] Write the text blocks for the assessment chapter** — skeleton with chunks and `% TODO (Jason)` markers is in place; write the prose for each step, incl. the part explaining `assess()` (criteria are extracted from `quality` one at a time instead of printing the full output). _Progress 2026-08-04: chapter lead-in, verify(), testOMF, construct-score reliability, and discriminant validity (HTMT thresholds + CI decision rule) are written; still to write: testOMF decision rule (95% quantile), indicator reliability, AVE (only the one conclusion sentence exists so far), weights. Added 2026-08-31: the three text blocks of the new structural subchapter (lead-in/paths, f², R²) — see item 7. Also 2026-08-31: the chapter lead-in (the "First … Seventh" enumeration, ~lines 357–367) still narrates the old flat seven-step sequence — rework it to introduce the three subchapters._ Open decisions inside the skeleton (additional to below): structural collinearity — the Abstract and Benitez both list collinearity as part of the structural assessment, and `quality$VIF` (structural VIF, verified) exists — decide whether 3.3 gets a VIF chunk. Open decisions inside the skeleton: multicollinearity step (Mode B VIF not applicable to the all-reflective retention model — show pattern only, or switch one construct to a composite? element name `quality$VIF_modeB` unverified, chunk is `eval=FALSE`) and whether loadings significance is repeated in the weights step per Benitez's composite checklist.
+_Items 11–14: from Claude's review of the assessment section (2026-08-04). Item 10 (testOMF error) moved to Done 2026-08-31._
 
 11. **[Sec. assessment] Fix knit-breakers** → folded into item 16 (plan verified 2026-08-18):
     - `\citet{Beran}` (~line 397): no bib entry — add Beran & Srivastava (1985, Annals of Statistics) to tutorial.bib.
@@ -38,6 +46,7 @@ _Items 11–14: from Claude's review of the assessment section (2026-08-04)._
     - **Tutorial fix (verified, works):** `quality_inf <- assess(res_csem, .quality_criterion = "htmt", .inference = TRUE, .seed = 42)` → 499 admissible draws; returned `$htmts` matrix has HTMT point estimates in the lower triangle and the 90% upper CI bounds in the upper triangle. Add `.seed` in any case (default is `NULL` → CI bounds change every knit). Consider `.absolute = FALSE` (cSEM warns it's recommended for resampling).
     - **Consequence for the lead-in:** HTMT2 is promised there (item 13) but is not computable for this dataset (NaN for JS–AC) — decide with Florian: drop HTMT2, or discuss the NaN as another example of cSEM surfacing problems SmartPLS hides (ties into items 1/6).
     - _Update 2026-08-18: Jason is now working on the HTMT2 fix in the cSEM repo himself. The tutorial-side chunk fix is part of item 16._
+    - _Update 2026-08-31: NaN-guard fix is in master and installed — the crash is gone. But the HTMT2 value for JS–AC stays NaN, as diagnosed: mixed-sign intra-/inter-block correlations make it uncomputable for this dataset. No code fix possible. What remains is the **decision with Florian** (see also item 13): drop HTMT2 from the lead-in, or keep the NaN and discuss it as cSEM surfacing a data problem SmartPLS hides (ties into items 1/6)._
     - **Upstream (plan: Jason opens the GitHub issue on 2026-08-05, then we fix it):** two defects to report — (a) missing NaN-guard in `calculateHTMT()`'s inference branch; (b) `assess()` has no error handling at all (verified: zero `tryCatch` in its source), so one failing criterion kills the whole call with a cryptic message while all successfully computed criteria are lost. Draft issue text below.
 
       ```markdown
@@ -75,7 +84,7 @@ _Items 11–14: from Claude's review of the assessment section (2026-08-04)._
       **Workaround for users:** `assess(res, .quality_criterion = "htmt", .inference = TRUE, .seed = ...)`.
       ```
 
-16. **Mechanical fix batch — plan verified 2026-08-18 (Claude), ready to apply on go-ahead.** Consolidates items 11, 12 (dedup part), 14 (typos), and the tutorial-side fix from 15. All element names verified in a live R session (`assess()` on the actual data, cSEM as installed). Line numbers refer to the .Rnw as of 2026-08-10. Edits:
+16. **Mechanical fix batch — plan verified 2026-08-18 (Claude), ready to apply on go-ahead.** Consolidates items 11, 12 (dedup part), 14 (typos), and the tutorial-side fix from 15. All element names verified in a live R session (`assess()` on the actual data, cSEM as installed). Line numbers refer to the .Rnw as of 2026-08-10 — _shifted by the 2026-08-31 restructure; locate edits by the quoted strings, not the line numbers._ Edits:
     - **tutorial.bib:** add entry `Beran1985` — Beran, R., & Srivastava, M. S. (1985). Bootstrap tests and confidence regions for functions of a covariance matrix. _The Annals of Statistics, 13_(1), 95–115. doi:10.1214/aos/1176346579.
     - **Cite keys:** `\citet{Beran}` (~399) → `\citet{Beran1985}`; `\citet{DijkstraandHenseler2015}` (~400) → `\citet{Dijkstra2015}`.
     - **Dangling ref (~383):** `\ref{sec:Customization}` → lowercase `\ref{sec:customization}` + TODO comment (prints "??" until the customization section is rebuilt; alternative: comment the sentence out — Jason to pick).
@@ -89,22 +98,34 @@ _Items 11–14: from Claude's review of the assessment section (2026-08-04)._
                             .absolute = FALSE)
       quality_inf$HTMT$htmts
       ```
-      Verified: runs clean, 499 admissible draws; `$htmts` is the 5×5 matrix (lower triangle = HTMT point estimates, upper triangle = 90% upper CI bounds). Note the element path: `quality_inf$HTMT$htmts`, not `quality_inf$htmts`.
+      Verified: runs clean, 499 admissible draws; `$htmts` is the 5×5 matrix (lower triangle = HTMT point estimates, upper triangle = 90% upper CI bounds). Note the element path: `quality_inf$HTMT$htmts`, not `quality_inf$htmts`. _2026-08-31: with the GitHub build the full-criteria call presumably no longer crashes (NaN-guard merged), but the workaround call stays the plan — HTMT2 inference for the NaN cell would rest on ~5 of 499 admissible draws and the point estimate is still NaN._
     - **Reliability dedup:** `assess-rho-A` chunk → `` quality$Reliability$`Dijkstra-Henselers_rho_A` `` (backticks required — hyphen in the name); `assess-cronbach-alpha` chunk → `quality$Reliability$Cronbachs_alpha`. `assess-rho_C` chunk untouched (trim decision stays in item 12).
-    - **Typos:** "assed" → "assessed" (~364, ~365); "checks of" → "checks whether" + "covarariance" → "covariance" (~380); **delete ~381 entirely** (near-verbatim repeat of ~380); "boostrap" → "bootstrap" (~399); "test the null" → "tests the null" + "indictator" → "indicator" (~419); "root mean square residual" → "standardized root mean square residual" (~420); "succeed the recommend threshold" → "exceed the recommended threshold" (~438); "Additionnaly" → "Additionally" (~439).
+    - **Typos:** "assed" → "assessed" (~364, ~365); "checks of" → "checks whether" + "covarariance" → "covariance" (~380); **delete ~381 entirely** (near-verbatim repeat of ~380); "boostrap" → "bootstrap" (~399); "test the null" → "tests the null" (~425; "indictator" already fixed by Jason 2026-08-31); "root mean square residual" → "standardized root mean square residual" (~420); "succeed the recommend threshold" → "exceed the recommended threshold" (~438); "Additionnaly" → "Additionally" (~439).
     - **Optional (Jason to confirm):** remove superseded `% TODO (Jason)` markers at ~368–371 (lead-in), ~384–387 (verify), ~454–457 (reliability — superseded once the dedup is applied).
     - _Bonus finding for item 13: default `assess()` output does contain `quality$HTMT2` (point estimates, with the NaN for JS–AC) — only the inference branch crashes._
+
+17. **Prose polish outside the assessment section (Jason) — from the 2026-08-31 full read-through:**
+    - ~148 (Introduction): sentence ends without a period after `\citep{Hwang2004,Hwang2021a}`.
+    - ~150: missing space in "`{Wold1982c},also known`".
+    - ~168: "their codebase is not openly accessible of transparency" — broken wording (something like "not openly accessible, which impedes transparency, …").
+    - ~249 (Model and Data): "an CSV File" → "a CSV file"; "using following command" → "using the following command" (same at ~272: "via following command").
+    - ~270: "each contain one missing values" → "one missing value".
+    - ~324 (Estimation): "partial leasts sqaures" → "partial least squares".
+    - Title page: hardcoded date "September 18, 2022" (~102) — update or switch to `\today`.
 
 ## Backlog (from earlier session, still open)
 
 - ~~`infer()` output too large~~ — largely resolved: the `infer(res_csem_boot)` call is gone from the .Rnw; the assessment skeleton now extracts only `summarize(res_csem_boot)$Estimates$Loading_estimates` / `$Weight_estimates`. Remaining aspect (percentile CIs) is covered by item 3 (tables built from R).
-- Fill the two remaining empty `\citep{}`: Introduction (open-science/accessibility claim, ~line 168) and "Model specification" (single-indicator constructs, ~line 291). (The ones in "Customizing the PLS algorithm" and the second Model-spec one are gone — section removed / resolved.)
+- Fill the empty `\citep{}` — now **three** (verified 2026-08-31): Introduction (open-science/accessibility claim, line 168), "Model specification" (reflective vs. composite models explanation, line 289 — newly spotted, was untracked) and (single-indicator constructs, line 291).
 - ~~`\ref{tab:measurement}` dangling~~ — obsolete, reference no longer in the .Rnw.
 - ~~"Further cSEM functionality" empty heading~~ — obsolete, heading removed; topic covered by items 4/7.
 - Decide: proper `renv::restore()` on Linux vs. current user-library workaround (renv `.Rprofile` is bypassed with `--no-init-file` for now).
 
 ## Done
 
+- ✅ **Shortened `assess()` overview output (2026-08-31):** section-aware knitr output hook in the setup chunk — chunks with option `excerpt.lines = n` show each section headline of the printed output plus the first n lines, "..." for omitted lines (logic tested against the real 169-line output → 73 lines at n = 5). Applied to `assess-quality` (`excerpt.lines = 5`); `% TODO (Jason)` marker added for the explanatory sentence. Reusable for other long outputs (e.g. `summarize()`). Caveat: keyed to cSEM's print separator style; if that changes, the untrimmed output appears (no error).
+- ✅ **testOMF() error (was item 10)** — fix merged in FloSchuberth/cSEM master, GitHub build installed, chunk confirmed working (2026-08-31). `.seed = 42` is active in the chunk and the external `set.seed(42)` workaround is gone (verified in the .Rnw).
+- ✅ Assessment chapter restructured into "Assessment Methods" with three numbered subchapters: 3.1 Overall model fit, 3.2 Reflective measurement and composite models, 3.3 Structural model evaluation (new skeleton) — 2026-08-31, see item 7.
 - ✅ Replaced `summary(HBAT_SEM_rel)` with `colSums(is.na(HBAT_SEM_rel))`; text now motivates the check (cSEM requires complete datasets without missings).
 - ✅ Moved `verify(res_csem)` + explanation out of 3.1; now opens "Customizing the PLS algorithm" as motivation for the customization options.
 - ✅ Added paragraph in 3.1 explaining the `NA` std. errors / t-values / p-values (point estimates only; bootstrap introduced in Section "Assessing the measurement model").

@@ -91,6 +91,34 @@ opts_chunk$set(
   prompt     = FALSE,
   tidy       = FALSE
 )
+
+# Output hook: chunks with the option excerpt.lines = n show only each section
+# headline of the printed output plus the first n lines after it; omitted lines
+# are replaced by "...". Section headlines are matched by the separator style of
+# cSEM's print methods ("____" frame lines and "---- title ----" lines).
+local({
+  hook_output <- knit_hooks$get("output")
+  knit_hooks$set(output = function(x, options) {
+    n <- options$excerpt.lines
+    if (!is.null(n)) {
+      lines <- unlist(strsplit(x, "\n"))
+      sep <- grep("^_{20,}|^-+ .+ -+$", lines)
+      if (length(sep) > 0) {
+        keep <- sort(unique(unlist(lapply(sep, function(i) i:min(i + n, length(lines))))))
+        out <- character(0)
+        prev <- 0
+        for (i in keep) {
+          if (i > prev + 1) out <- c(out, "\t...", "")
+          out <- c(out, lines[i])
+          prev <- i
+        }
+        if (prev < length(lines)) out <- c(out, "\t...")
+        x <- paste0(paste(out, collapse = "\n"), "\n")
+      }
+    }
+    hook_output(x, options)
+  })
+})
 @
 
 \pagenumbering{gobble}
@@ -138,6 +166,8 @@ Keywords: measurement error, bias correction, partial least squares structural e
 
 
 \newpage
+
+\tableofcontents
 
 \pagenumbering{arabic}
 % \doublespacing
@@ -188,7 +218,7 @@ Therefore, this tutorial presents the R package \pkg{cSEM} as a full-fledged ope
 
 \section{\texorpdfstring{\pkg{cSEM}}{cSEM} R Illustration}
 \label{sec:illustration}
-\subsection{Getting started with R}
+\subsection{Getting started with \pkg{cSEM}}
 
 To use the \pkg{cSEM} package, users first need to install \textsf{R} and an integrated development environment (IDE) such as \textsf{RStudio}.
 For the installation, we refer to the official guides for \textsf{R} (\url{https://cran.r-project.org}) and \textsf{RStudio} (\url{https://posit.co/download/rstudio-desktop}).
@@ -307,10 +337,8 @@ model <- "
 "
 @
 
-\section{Estimating the model with \texorpdfstring{\pkg{cSEM}}{cSEM}}
+\subsection{Model estimation}
 \label{sec:estimation}
-
-\subsection{Running the estimation}
 
 The central function is \fn{csem()}.
 The minimal input required for the \fn{csem()} function is a dataset and a model:
@@ -351,82 +379,71 @@ Note that the standard errors, $t$-values, and $p$-values in the \fn{summarize()
 The reason is that a plain \fn{csem()} call computes point estimates only.
 To conduct statistical inference, the standard errors of the estimates must be obtained by a resampling procedure such as the bootstrap, which is introduced in Section~\ref{sec:assessment}.
 
-\section{\texorpdfstring{Assessment methods in \pkg{cSEM}}{Assessment methods in cSEM}}
+\section{Assessment Methods}
 \label{sec:assessment}
 
 The next step involves assessing the model estimates, according to the guidelines described in \citet{Benitez2020}.
-Before any results are interpreted, we first validate the estimation. 
-Second we assess the model adequacy, with $SRMR, d\_{uls}$ and $d\_{G}$.
-Third we subsequently examine the reliability of construct scores, with the Dijkstra--Henseler's $\rho_A$.
-Fourth we check the factor loading estimates and significance.
-Fifth we assess construct validity, i.e. convergent and discriminant validity \citep{campbell_convergent_1959}. 
+The first step involves testing for overall model fit. 
+The second step addresses the assessment of the reflective measurement models. 
+The third step evaluates the Structural model. 
 
-Convergent validity is assed via the average variance extracted $AVE$.
-Discriminant validity is assed with the $HTMT$ and its improved version $HTMT2$.
-Sixth we check for multicollinearity, via $VIF$.
-Seventh we check the weights and loadings values and their significance.
-% TODO (Jason): chapter lead-in — overview of the assessment steps in Benitez order:
-% validation of the estimation -> model adequacy (fit) -> reliability of construct scores
-% -> indicator reliability -> convergent validity -> discriminant validity
-% -> multicollinearity -> weights.
+\subsection{Overall model fit}
+\label{sec:overall-fit}
 
-\subsection*{Validation of the estimation}
-
-Before we interpret any results, we need to ensure the estimation is valid. 
+In this section we test for overall model fit.
+But before we need to ensure the estimation is valid. 
 This is done with the \fn{verify()} function. 
 This function gives the user details about the estimation. 
 It gives information if convergence is achieved, all absolute standardized loading 
 estimates are smaller or equal than one.
 It also checks of the construct variance covariance matrix is positive semi-definite, if all reliability estimates are smaller or equal than one and if the model-implied indicator variance covarariance matrix is positive semi-definite. 
-It also checks if the construct and the model-implied indicator variance covariance matrix are semi positive definite   and if all reliability estimates are smaller or equal than one.
-If a check fails, the results should not be interpreted and the user needs to customize the algorithm to ensure a valid estimation process. 
+It also checks if the construct and the model-implied indicator variance covariance matrix are semi positive definite and if all reliability estimates are smaller or equal than one.
+If a check fails, the results should not be interpreted and the user needs to customize the algorithm to ensure a valid estimation process.
 For that check Section \ref{sec:Customization}.
-% TODO (Jason): text — before interpreting any results, ensure the estimation is valid:
-% verify() checks convergence, all rho_A positive (necessary for the PLSc correction),
-% admissible model-implied indicator correlation matrix. If a check fails, results must
-% not be interpreted -> forward pointer to the customization section (algorithm settings).
-
 <<verify>>=
 # Check whether the estimation is admissible
 verify(res_csem)
 @
 
 
-\subsection*{Testing the adequacy of the model}
-
-In this section we test the overall model fit. 
+After that we can examine the overall model fit with the function \fn{testOMF()}. 
 %For that we examine the $SRMR$, $d_{ULS}$, squared Eucliedean distance, and $d_G$, geodestic distance.
 The function \fn{testOMF()} is a boostrap-based test for model fit originally proposed by \citet{Beran}. 
-See also \citet{DijkstraandHenseler2015} who first suggested the test in the context of PLS-PM. 
-% TODO (Jason): text — overall model fit: SRMR, d_ULS (squared Euclidean distance), d_G
-% (geodesic distance); bootstrap-based test comparing empirical and model-implied
-% correlation matrix (testOMF), decision rule via the 95% quantile of the bootstrap
-% distribution.
-
+See also \citet{DijkstraandHenseler2015} who first suggested the test in the context of PLS-PM.
+It outputs various overall model fit indices, such as the $d\_G$, $SRMR$:
 <<test-omf>>=
 # Bootstrap-based test of the overall model fit
-set.seed(42)
 fit_test <- testOMF(
   res_csem,
   .R                    = 1000,
-  #.seed                 = 42,
+  .seed                 = 42,
   .handle_inadmissibles = "replace"
-  #.Random.seed = 42
 )
 
 fit_test
 @
-By default \fn{testOMF()} test the null hypothesis that the population indictator correlation matrix equals the population model-implied indicator correlation matrix. 
+By default \fn{testOMF()} test the null hypothesis that the population indicator correlation matrix equals the population model-implied indicator correlation matrix. 
 \fn{testOMF()} uses different distance measures to assess the distance between the sample indicator correlation matrix and the estimated model-implied indicator correlation matrix, namely the geodesic distance ($d_G$), the squared Euclidean distance $d_{ULS}$ and the root mean square residual $SRMR$.
 
-\subsection*{Evaluating the reliability of the construct scores}
+\subsection{Assessment of the reflective measurement models}
+\label{sec:measurement}
 
-The \fn{assess()} function computes all relevant quality criteria:
 
-<<assess-quality>>=
+
+\subsubsection*{Evaluating the reliability of the construct scores}
+
+The \fn{assess()} function computes all relevant quality criteria
+
+<<assess-quality, excerpt.lines = 5>>=
 #Compute all quality criteria
-quality <- assess(res_csem)
+quality <- assess(res_csem, .inference = "asymptotic")
+quality
 @
+
+% TODO (Jason): text — one or two sentences on the output above: printing `quality`
+% shows all criteria grouped in titled sections; the output here is shortened for
+% presentation ("..." marks omitted lines), running the code yields the full report.
+% In the following, the criteria are extracted from `quality` one at a time.
 
 
 <<assess-rho-A>>=
@@ -456,7 +473,7 @@ quality$RhoC_weighted_mm
 % (the reliability used by the PLSc correction); alternative estimates (Cronbach's
 % alpha, rho_C) also reported.
 
-\subsection*{Evaluating indicator reliability}
+\subsubsection*{Evaluating indicator reliability}
 
 % TODO (Jason): text — indicator reliability via the factor loading estimates,
 % threshold 0.708 (loading^2 >= 0.5), OC1 case + content-validity argument.
@@ -479,7 +496,7 @@ res_csem_boot <- csem(
 summarize(res_csem_boot)$Estimates$Loading_estimates
 @
 
-\subsection*{Evaluating convergent validity}
+\subsubsection*{Evaluating convergent validity}
 
 % TODO (Jason): text — AVE >= 0.5, relation to indicator loadings.
 
@@ -490,7 +507,7 @@ quality$AVE
 
 The average variance extracted (AVE) for all constructs are above the recommended threshold of $0.5$, supporting convergent validity.
 
-\subsection*{Evaluating discriminant validity}
+\subsubsection*{Evaluating discriminant validity}
 To assess discriminant validity users can utilize the HTMT \citep{Henseler2015} which is calculated with the default options within the \fn{assess()} function.
 There are several ways on testing for discriminant validity with the HTMT.
 One can compare the HTMT with a threshold, common values are 0.85 and 0.9 \citep{Henseler2015}.
@@ -517,7 +534,7 @@ quality_inf$HTMT
 @
 
 
-\subsection*{Assessing multicollinearity among the indicators and Evaluating the weights}
+\subsubsection*{Assessing multicollinearity among the indicators and Evaluating the weights}
 
 % TODO (Jason/Florian): decide how to present this step — collinearity among indicators
 % concerns composite (Mode B) measurement; in the retention model all constructs are
@@ -546,6 +563,42 @@ quality$VIF_modeB
 summarize(res_csem_boot)$Estimates$Weight_estimates
 @
 
+\subsection{Structural model evaluation}
+\label{sec:structural}
+
+% TODO (Jason): text — lead-in: once the measurement models are established, the
+% structural model can be evaluated: path coefficient estimates and their significance
+% (bootstrap), effect sizes (f^2), and the coefficient of determination (R^2).
+
+<<paths-boot>>=
+# Path coefficient estimates incl. bootstrap std. errors, t-values and p-values
+summarize(res_csem_boot)$Estimates$Path_estimates
+@
+
+% TODO (Jason): text — effect sizes f^2: change in R^2 when a predictor is omitted;
+% common benchmarks 0.02 / 0.15 / 0.35 (small / medium / large).
+
+<<effect-sizes>>=
+# Effect sizes (f^2)
+quality$F2
+@
+
+% TODO (Jason): text — explained variance: R^2 and adjusted R^2 of the endogenous
+% constructs (JS, OC, SI).
+
+<<r-squared>>=
+# Coefficient of determination (R^2) and adjusted R^2
+quality$R2
+quality$R2_adj
+@
+
+
+\section{Further features of CSEM}
+\subsection{Customization of PLS-PM}
+\subsection{predictive model assessment}
+\subsection{non linear}
+
+\section{Concluding remarks}
 
 \newpage
 

@@ -1,0 +1,16 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1}%
+\contentsline {section}{\numberline {2}\textsf {cSEM} R Illustration}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Getting started with \textsf {cSEM}}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Model and Data}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Model specification}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Model estimation}{5}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Assessment Methods}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Overall model fit}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Assessment of the reflective measurement models}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Structural model evaluation}{15}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Further features of CSEM}{16}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Customization of PLS-PM}{16}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}predictive model assessment}{16}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}non linear}{16}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Concluding remarks}{16}{section.5}%
