@@ -459,7 +459,7 @@
       "RemoteUsername": "FloSchuberth",
       "RemoteRepo": "cSEM",
       "RemoteRef": "master",
-      "RemoteSha": "ad959220f261cac6fcc38c1543785d179b84dcfe"
+      "RemoteSha": "392b9a31e0d3179e1a8c4ef001628146a14067ce"
     },
     "cli": {
       "Package": "cli",

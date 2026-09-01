@@ -8,9 +8,9 @@
 \contentsline {section}{\numberline {3}Assessment Methods}{7}{section.3}%
 \contentsline {subsection}{\numberline {3.1}Overall model fit}{7}{subsection.3.1}%
 \contentsline {subsection}{\numberline {3.2}Assessment of the reflective measurement models}{9}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Structural model evaluation}{76}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Further features of \textsf {cSEM}}{76}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Customization of PLS-PM}{76}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}predictive model assessment}{76}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}non linear}{76}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Concluding remarks}{76}{section.5}%
+\contentsline {subsection}{\numberline {3.3}Structural model evaluation}{18}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Further features of \textsf {cSEM}}{19}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Customization of PLS-PM}{19}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}predictive model assessment}{19}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}non linear}{19}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Concluding remarks}{19}{section.5}%

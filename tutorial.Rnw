@@ -210,23 +210,6 @@ For example, their codebase is not openly accessible of transparency \citep{Mori
 Open-source software overcomes these limitations \citep{Barba2022}.
 Therefore, this tutorial presents the R package \pkg{cSEM} as a full-fledged open-source alternative to SmartPLS to apply PLS-PM and PLSc.
 
-% ── Roadmap blueprint ─────────────────────────────────────────────────
-% TODO: uncomment and adapt once the paper structure is final (see TODO.md, items 7/8).
-% Blueprint follows the proposed structure: 2. cSEM R Illustration (incl. estimation),
-% 3. Assessment methods in cSEM, 4. Comparison with alternative estimators,
-% 5. Customization of PLS-PM, then further functionality / discussion (TBD).
-%
-% The remainder of the tutorial is structured as follows.
-% Section~\ref{sec:illustration} shows how to get started with R, introduces the employee retention model and data used for the illustration, and demonstrates how the model is specified and estimated.
-% Section~\ref{sec:assessment} presents the assessment methods in \pkg{cSEM} for the measurement and the structural model.
-% Section~\ref{sec:comparison} compares the PLS results with those of alternative estimators.
-% Section~\ref{sec:customization} presents the options to customize PLS-PM.
-% Section~\ref{sec:further} highlights further functionality of the \pkg{cSEM} package.
-% Finally, Section~\ref{sec:discussion} concludes with a discussion.
-% ──────────────────────────────────────────────────────────────────────
-
-
-
 \section{\texorpdfstring{\pkg{cSEM}}{cSEM} R Illustration}
 \label{sec:illustration}
 \subsection{Getting started with \pkg{cSEM}}
@@ -367,24 +350,22 @@ To ultimately estimate with the csem function, we call it and save the results a
 <<csem-est>>=
 # PLSc-SEM estimation
 res_csem <- csem(
-  .data  = HBAT_SEM_rel,
-  .model = model
+  .data             = HBAT_SEM_rel,
+  .model            = model,
+  .resample_method  = "bootstrap",
+  .R                = 1000,
+  .seed             = 42
 )
 @
 
 To obtain a comprehensive overview of all results, including loadings, path coefficients, reliability measures, and $R^2$ values, use:
 
-<<summary-rescsem,  eval = TRUE, results='hide'>>=
+<<summary-rescsem, excerpt.lines = 8>>=
 # Full results summary
 summary_res <- summarize(res_csem)
-print(summary_res)
+summary_res
 @
 
-<<summary-rescsem-compact>>=
-# For a more compact overview
-summary_res$Estimates$Loading_estimates
-summary_res$Estimates$Path_estimates
-@
 
 Note that the standard errors, $t$-values, and $p$-values in the \fn{summarize()} output are reported as \code{NA}.
 The reason is that a plain \fn{csem()} call computes point estimates only.
@@ -420,7 +401,7 @@ After that we can examine the overall model fit with the function \fn{testOMF()}
 %For that we examine the $SRMR$, $d_{ULS}$, squared Eucliedean distance, and $d_G$, geodestic distance.
 The function \fn{testOMF()} is a bootstrap-based test for model fit originally proposed by \citet{Beran1985}.
 See also \citet{Dijkstra2015} who first suggested the test in the context of PLS-PM.
-It outputs various overall model fit indices, such as the $d_G$, $SRMR$:
+It outputs various overall model fit indices, such as the $d_G$, $SRMR$ and $d_L$:
 <<test-omf>>=
 # Bootstrap-based test of the overall model fit
 fit_test <- testOMF(
@@ -433,7 +414,7 @@ fit_test <- testOMF(
 fit_test
 @
 By default \fn{testOMF()} tests the null hypothesis that the population indicator correlation matrix equals the population model-implied indicator correlation matrix. 
-\fn{testOMF()} uses different distance measures to assess the distance between the sample indicator correlation matrix and the estimated model-implied indicator correlation matrix, namely the geodesic distance ($d_G$), the squared Euclidean distance $d_{ULS}$ and the standardized root mean square residual $SRMR$.
+\fn{testOMF()} uses different distance measures to assess the distance between the sample indicator correlation matrix and the estimated model-implied indicator correlation matrix, namely the geodesic distance ($d_G$), the squared Euclidean distance $d_{L}$ and the standardized root mean square residual $SRMR$.
 
 \subsection{Assessment of the reflective measurement models}
 \label{sec:measurement}
@@ -474,20 +455,9 @@ quality$RhoC_weighted_mm
 % resampling promised in the estimation section is introduced.
 % (Style decision 2026-08-31: describe what can be done, no thresholds/decision rules.)
 
-<<csem-boot, warning = FALSE>>=
-# Re-estimate with bootstrap resampling for inference
-res_csem_boot <- csem(
-  .data             = HBAT_SEM_rel,
-  .model            = model,
-  .resample_method  = "bootstrap",
-  .R                = 1000,
-  .seed             = 42
-)
-@
-
 <<loadings-boot>>=
 # Loading estimates incl. bootstrap std. errors, t-values and p-values
-summarize(res_csem_boot)$Estimates$Loading_estimates
+summarize(res_csem)$Estimates$Loading_estimates
 @
 
 \subsubsection*{Evaluating convergent validity}
@@ -522,12 +492,13 @@ The warning message says that some of the correlations between the indicators ha
 This does not lead to any calculation issues.
 
 The improved version HTMT2 and its inference can be calculated via bootstrap confidence intervals. 
-<<htmt2, warning = TRUE>>=
+<<htmt2, warning = FALSE>>=
 # Heterotrai-monotrait ratio 2 of correlations (HTMT2)
 HTMT2 <- assess(res_csem,
-                .qualitiy_criterion = "htmt2",
+                .quality_criterion = "htmt2",
                 .inference = "bootstrap",
                 .absolute = FALSE)
+HTMT2
 @
 
 
@@ -557,7 +528,7 @@ quality$VIF_modeB
 
 <<weights-boot>>=
 # Weight estimates incl. bootstrap std. errors, t-values and p-values
-summarize(res_csem_boot)$Estimates$Weight_estimates
+summarize(res_csem)$Estimates$Weight_estimates
 @
 
 \subsection{Structural model evaluation}
@@ -569,7 +540,7 @@ summarize(res_csem_boot)$Estimates$Weight_estimates
 
 <<paths-boot>>=
 # Path coefficient estimates incl. bootstrap std. errors, t-values and p-values
-summarize(res_csem_boot)$Estimates$Path_estimates
+summarize(res_csem)$Estimates$Path_estimates
 @
 
 % TODO (Jason): text — effect sizes f^2: change in R^2 when a predictor is omitted.
