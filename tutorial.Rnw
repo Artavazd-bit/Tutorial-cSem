@@ -215,7 +215,7 @@ Therefore, this tutorial presents the R package \pkg{cSEM} as a full-fledged ope
 \subsection{Getting started with \pkg{cSEM}}
 
 To use the \pkg{cSEM} package, users first need to install \textsf{R} and an integrated development environment (IDE) such as \textsf{RStudio}.
-For the installation, we refer to the official guides for \textsf{R} (\url{https://cran.r-project.org}) and \textsf{RStudio} (\url{https://posit.co/download/rstudio-desktop}).
+For the installation, refer to the official guides for \textsf{R} (\url{https://cran.r-project.org}) and \textsf{RStudio} (\url{https://posit.co/download/rstudio-desktop}).
 
 When \textsf{RStudio} is opened for the first time, it displays four panes (Figure~\ref{fig:rstudio}).
 The two most important ones are the \emph{script editor} (upper left), where code is written and saved, and the \emph{Console} (lower left), where the code is executed and results are printed.
@@ -245,7 +245,7 @@ After installation, the package must be loaded at the start of every new \textsf
 library(cSEM)
 @
 
-With \pkg{cSEM} installed and loaded, we can now import the data and specify the model, as described in the following sections.
+With \pkg{cSEM} installed and loaded, the data can now be imported and the model specified, as described in the following sections.
 
 \input{LaTeX/plots/rstudio_test.tex}
 
@@ -268,7 +268,7 @@ The model is presented in Figure \ref{fig:retentionmodel}.
 
 The dataset used for model estimation is publicly available from the SmartPLS website: \url{https://www.smartpls.com/documentation/sample-projects/employee-retention}. 
 The synthetic dataset comprises $N = 400$ observations from HBAT Industries and was generated to satisfy the assumptions of factor-based SEM, including multivariate normality.
-For this tutorial, we assume the data has been downloaded as a CSV file.
+For this tutorial, the data is assumed to be downloaded as a CSV file.
 After downloading the dataset, it needs to be loaded into the R Environment.
 The Employee Retention dataset is stored as a CSV file using ';' as the separator, thus it can be loaded into R using the following command:
 
@@ -290,9 +290,10 @@ dim(HBAT_SEM_rel)
 colSums(is.na(HBAT_SEM_rel))
 @
 
-Since \pkg{cSEM} can only handle complete datasets, i.e., datasets without any missing values, we check the number of missing values per variable using the \fn{is.na()} function.
+Since \pkg{cSEM} can only handle complete datasets, i.e., datasets without any missing values, the dataset is checked using the \fn{is.na()} function.
 The output shows that the variables AC4 and EP4 each contain one missing value.
-Before we can continue, we thus need to either apply imputation methods or delete the incomplete observations.
+%Before we can continue, we thus need to either apply imputation methods or delete the incomplete observations.
+To ensure that the estimation can be perfomed the missing observations need to be deleted or inputation methods need to be applied. 
 Deleting incomplete observations can be done via the following command:
 
 <<missing-data>>=
@@ -340,9 +341,9 @@ The dataset should be a data frame or a matrix with column names matching the in
 The package cSEM handles a lot of different data types natively, such as  "\code{logical}", "\code{numeric}" ("\code{double} or "\code{integer}"), "\code{factor}" ("\code{ordered} and/or "\code{unordered}"), "\code{character}" or a mix of several types.
 The model is needed to be written in \pkg{lavaan} syntax, with \code{=\~}  for measurement relations and \texttt{\~} for structural (regression) relations.
 
-By default weights are estimated using the partial least squares path modeling algorithm ("PLS-PM").
+By default weights are estimated using the consistent partial least squares path modeling algorithm ("PLS-PM").
 
-To ultimately estimate with the csem function, we call it and save the results as \code{res\_csem}:
+To ultimately estimate with the csem function, the function is called and save the output is saved as \code{res\_csem}:
 
 Inference and confidence intervals can be obtained via bootstrap resampling. 
 For this the parameter \prm{.resample\_method} is set to "bootstrap", another option is "jackknife". 
@@ -373,16 +374,14 @@ Executing the provided code will return the whole output.
 \section{Assessment Methods}
 \label{sec:assessment}
 
-The next step involves assessing the model estimates, according to the guidelines described in \citet{Benitez2020}.
-The first step involves testing for overall model fit. 
-The second step addresses the assessment of the reflective measurement models. 
-The third step evaluates the structural model.
+Next, the model estimates are assessed, according to the guidelines described in \citet{Benitez2020}.
+This assessment comprises three parts: 
+The assessment of the overall model fit, the assessment of the reflective measurement models, and the evaluation of the structural model.
 
 \subsection{Overall model fit}
 \label{sec:overall-fit}
 
-In this section we test for overall model fit.
-But before we need to ensure the estimation is valid. 
+Before the overall model fit can be tested, the estimation needs to be validated. 
 This is done with the \fn{verify()} function. 
 This function gives the user details about the estimation. 
 It gives information if convergence is achieved, all absolute standardized loading 
@@ -395,8 +394,7 @@ For that check Section \ref{sec:customization}.
 verify(res_csem)
 @
 
-
-After that we can examine the overall model fit with the function \fn{testOMF()}. 
+After that the overall model fit with the function \fn{testOMF()} can be examined.. 
 The function \fn{testOMF()} is a bootstrap-based test for model fit originally proposed by \citet{Beran1985}.
 See also \citet{Dijkstra2015} who first suggested the test in the context of PLS-PM.
 By default \fn{testOMF()} tests the null hypothesis that the population indicator correlation matrix equals the population model-implied indicator correlation matrix. 
@@ -434,14 +432,24 @@ In the following, the criteria of \fn{assess()} are extracted one at a time.
 
 \subsubsection*{Evaluating the reliability of the construct scores}
 \label{sec:reliability}
-In this step we evaluate whether the construct scores reliably represent the underlying construct. 
-We can extract the information for the reliability assessment out of the assess object with the operator: 
+In this step we evaluate whether the items reliably represent the underlying construct.
+Reliability asks how much of the items variance can be explained by the undelying construct. 
+A construct with high reliability tends to produce similar items under consistent conditions \citet{Reliability}.
+The \pkg{cSEM} package offers a variety of different reliability coefficients.
+These include Cronbach's $\alpha$ \citet{Cronbach}, Jöreskog's congeneric reliability $\rho_C$ \citet{Joereskog}, and Dijkstra--Henseler's $\rho_A$ \citet{Dijkstra}.
+These coeffificents differ in their assumption imposed on the measurment models. 
+Cronbach's $\alpha$ assumes ... weights and ... items. 
+Jöreskog's $\rho_C$ allows loadings to ... but still assumes ... weights. 
+Dijkstra--Henseler's $\rho_A$ ...
+
+We can extract the information for the reliability assessment out of the assess object with the $\mathdollar$ operator: 
 <<assess-rho-A>>=
 #Show Dijkstras and Henselers rho A
 quality$Reliability
 @
 This prints out Cronbach\_alpha, Joereskogs\_rho, Dijkstra-Henseler\_rho\_A. 
 
+Additionnaly the \fn{assess()} function offers alternative reliability coefficients. 
 <<assess-rho_C>>=
 # Show rho_C
 quality$RhoC
