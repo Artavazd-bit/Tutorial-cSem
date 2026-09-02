@@ -347,7 +347,7 @@ To ultimately estimate with the csem function, the function is called and save t
 
 Inference and confidence intervals can be obtained via bootstrap resampling. 
 For this the parameter \prm{.resample\_method} is set to "bootstrap", another option is "jackknife". 
-Confidence intervals are calculated based on \prm{.R} bootstrap resamples, and a \prm{.seed} can be set to ensure reproducibility. 
+Confidence intervals are calculated based on \prm{.R} bootstrap resamples, and a \prm{.seed} can be set to ensure reproducibility.
 
 <<csem-est>>=
 # PLSc-SEM estimation
@@ -432,8 +432,25 @@ In the following, the criteria of \fn{assess()} are extracted one at a time.
 
 \subsubsection*{Evaluating the reliability of the construct scores}
 \label{sec:reliability}
+
+%\subsection*{Evaluating the weights}
+% braucht man das wirklich???
+
+
+% TODO (Jason): text — weight estimates (value/sign) and their significance from the
+% bootstrap. Note: significance of the loadings is already covered in the indicator
+% reliability step above; decide whether it needs to be repeated here per Benitez's
+% checklist for composites.
+
+<<weights-boot>>=
+# Weight estimates incl. bootstrap std. errors, t-values and p-values
+summarize(res_csem)$Estimates$Weight_estimates
+@
+
+
+
+
 In this step we evaluate whether the items reliably represent the underlying construct.
-Reliability asks how much of the items variance can be explained by the undelying construct. 
 A construct with high reliability tends to produce similar items under consistent conditions \citet{Reliability}.
 The \pkg{cSEM} package offers a variety of different reliability coefficients.
 These include Cronbach's $\alpha$ \citet{Cronbach}, Jöreskog's congeneric reliability $\rho_C$ \citet{Joereskog}, and Dijkstra--Henseler's $\rho_A$ \citet{Dijkstra}.
@@ -447,7 +464,6 @@ We can extract the information for the reliability assessment out of the assess 
 #Show Dijkstras and Henselers rho A
 quality$Reliability
 @
-This prints out Cronbach\_alpha, Joereskogs\_rho, Dijkstra-Henseler\_rho\_A. 
 
 Additionnaly the \fn{assess()} function offers alternative reliability coefficients. 
 <<assess-rho_C>>=
@@ -460,11 +476,12 @@ quality$RhoC_weighted_mm
 
 
 \subsubsection*{Evaluating indicator reliability}
-Indicator reliability ensures that ...
+While the reliability of the construct scores summarizes the measurement quality of each ocnstruct as a whole, indicator reliability examines the contribution of each individual indicator. 
+Indicator reliability encapsulates how much variance can be explained by the underlying construct.
 It can be assessed via the factor loadings ...
-For that we extract out of the csem object the loading\_estimates and its standard errors and its corresponding confidence intervals. 
+For that we extract out of the \fn{csem} object res_csem the loadings, its standard errors, and its corresponding confidence intervals. 
 This requires the bootstrap or jackknife for resampling. 
-Thats why we did the bootstrap in the call of the csem function. 
+Thats why we did the bootstrap in the call of the \fn{csem} function. 
 % TODO (Jason): text — indicator reliability can be assessed via the factor loading
 % estimates. Significance of the loadings requires the bootstrap -> this is where the
 % resampling promised in the estimation section is introduced.
@@ -477,6 +494,7 @@ summarize(res_csem)$Estimates$Loading_estimates
 
 \subsubsection*{Evaluating convergent validity}
 Convergent validity is the extent to which the indicators belong to one latent variable actually measure the same construct.
+In the \pkg{cSEM} package this is done with the average variance extracted (AVE) \citet{}. 
 % TODO (Jason): text — convergent validity can be assessed via the AVE; relation to
 % the indicator loadings. (No thresholds — describe what can be done.)
 
@@ -530,20 +548,6 @@ HTMT2
 <<vif-indicators, eval = FALSE>>=
 # VIF values for Mode B (composite) weights
 quality$VIF_modeB
-@
-
-%\subsection*{Evaluating the weights}
-% braucht man das wirklich???
-
-
-% TODO (Jason): text — weight estimates (value/sign) and their significance from the
-% bootstrap. Note: significance of the loadings is already covered in the indicator
-% reliability step above; decide whether it needs to be repeated here per Benitez's
-% checklist for composites.
-
-<<weights-boot>>=
-# Weight estimates incl. bootstrap std. errors, t-values and p-values
-summarize(res_csem)$Estimates$Weight_estimates
 @
 
 \subsection{Structural model evaluation}
