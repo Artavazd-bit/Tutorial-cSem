@@ -437,10 +437,27 @@ In the following, the criteria of \fn{assess()} are extracted one at a time.
 % braucht man das wirklich???
 
 
-% TODO (Jason): text — weight estimates (value/sign) and their significance from the
-% bootstrap. Note: significance of the loadings is already covered in the indicator
-% reliability step above; decide whether it needs to be repeated here per Benitez's
-% checklist for composites.
+% TODO (Jason): pick ONE option below, uncomment it, delete the others.
+% (Note: significance of the loadings is already covered in the indicator reliability
+% step; option C addresses whether this subsection is needed at all for Mode A.)
+%
+% --- OPTION A (procedural) ---
+% Besides the reliability coefficients, the weight estimates themselves can be
+% inspected. The \fn{summarize()} function returns the weight estimates together
+% with their bootstrap standard errors, t-values, and p-values, which allows the
+% user to judge the sign, magnitude, and significance of each weight.
+%
+% --- OPTION B (rationale-first) ---
+% The weights determine how the indicators are combined into the construct scores
+% and therefore deserve inspection in their own right. Since the estimation in
+% Section \ref{sec:estimation} already included a bootstrap run, \fn{summarize()}
+% directly reports standard errors, t-values, and p-values for each weight estimate.
+%
+% --- OPTION C (minimal, with pointer) ---
+% For completeness, the weight estimates and their bootstrap-based inference can be
+% extracted via \fn{summarize()}. Note that for purely reflective measurement
+% models, as in the present example, the assessment typically focuses on the
+% loadings; the weights are primarily of interest for composite (Mode B) measurement.
 
 <<weights-boot>>=
 # Weight estimates incl. bootstrap std. errors, t-values and p-values
@@ -454,10 +471,11 @@ In this step we evaluate whether the items reliably represent the underlying con
 A construct with high reliability tends to produce similar items under consistent conditions \citet{Reliability}.
 The \pkg{cSEM} package offers a variety of different reliability coefficients.
 These include Cronbach's $\alpha$ \citet{Cronbach}, Jöreskog's congeneric reliability $\rho_C$ \citet{Joereskog}, and Dijkstra--Henseler's $\rho_A$ \citet{Dijkstra}.
-These coeffificents differ in their assumption imposed on the measurment models. 
-Cronbach's $\alpha$ assumes ... weights and ... items. 
-Jöreskog's $\rho_C$ allows loadings to ... but still assumes ... weights. 
-Dijkstra--Henseler's $\rho_A$ ...
+These coeffificents differ in their assumption imposed on the measurment models.
+Cronbach's $\alpha$ assumes equal weights and tau-equivalent items, i.e., equal population loadings across indicators \citet{}.
+Jöreskog's $\rho_C$ allows loadings to differ across indicators but still assumes unit weights when forming the construct scores \citet{}.
+Dijkstra--Henseler's $\rho_A$ relaxes both, as it is based on the estimated weights, and thus matches how the construct scores were actually computed \citet{}.
+
 
 We can extract the information for the reliability assessment out of the assess object with the $\mathdollar$ operator: 
 <<assess-rho-A>>=
@@ -478,14 +496,10 @@ quality$RhoC_weighted_mm
 \subsubsection*{Evaluating indicator reliability}
 While the reliability of the construct scores summarizes the measurement quality of each ocnstruct as a whole, indicator reliability examines the contribution of each individual indicator. 
 Indicator reliability encapsulates how much variance can be explained by the underlying construct.
-It can be assessed via the factor loadings ...
-For that we extract out of the \fn{csem} object res_csem the loadings, its standard errors, and its corresponding confidence intervals. 
-This requires the bootstrap or jackknife for resampling. 
-Thats why we did the bootstrap in the call of the \fn{csem} function. 
-% TODO (Jason): text — indicator reliability can be assessed via the factor loading
-% estimates. Significance of the loadings requires the bootstrap -> this is where the
-% resampling promised in the estimation section is introduced.
-% (Style decision 2026-08-31: describe what can be done, no thresholds/decision rules.)
+It can be assessed via the factor loadings, since the squared standardized loading equals the proportion of indicator variance attributable to the construct.
+For that we extract out of the \fn{csem} object res_csem the loadings, its standard errors, and its corresponding confidence intervals.
+ To also judge the precision and significance of the loading estimates, standard errors and confidence intervals are needed, which in PLS-PM are obtained by resampling. 
+This is why the bootstrap was already requested in the \fn{csem()} call in Section \ref{sec:estimation}.
 
 <<loadings-boot>>=
 # Loading estimates incl. bootstrap std. errors, t-values and p-values
@@ -494,9 +508,9 @@ summarize(res_csem)$Estimates$Loading_estimates
 
 \subsubsection*{Evaluating convergent validity}
 Convergent validity is the extent to which the indicators belong to one latent variable actually measure the same construct.
-In the \pkg{cSEM} package this is done with the average variance extracted (AVE) \citet{}. 
-% TODO (Jason): text — convergent validity can be assessed via the AVE; relation to
-% the indicator loadings. (No thresholds — describe what can be done.)
+In the \pkg{cSEM} package this is done with the average variance extracted (AVE) \citet{}.
+The AVE summarizes, per construct, how much of the indicators' variance is captured by the construct rather than by measurement. 
+It thus aggregates the indicator reliabilities from the previous step to the construct level.
 
 <<ave>>=
 # Average variance extracted (AVE)
@@ -535,43 +549,33 @@ HTMT2
 @
 
 
-\subsubsection*{Assessing multicollinearity among the indicators and Evaluating the weights}
-
-% TODO (Jason/Florian): decide how to present this step — collinearity among indicators
-% concerns composite (Mode B) measurement; in the retention model all constructs are
-% reflective (Mode A), so no Mode B VIF values are computed for this example.
-% Options: state that the check is not applicable here and show the code pattern only,
-% or switch one construct to a composite for illustration.
-% NOTE: element name below (quality$VIF_modeB) still to be verified against the cSEM
-% documentation; chunk is eval=FALSE until this step is settled.
-
-<<vif-indicators, eval = FALSE>>=
-# VIF values for Mode B (composite) weights
-quality$VIF_modeB
-@
-
 \subsection{Structural model evaluation}
 \label{sec:structural}
 
-% TODO (Jason): text — lead-in: once the measurement models are established, the
-% structural model can be evaluated: path coefficient estimates and their significance
-% (bootstrap), effect sizes (f^2), and the coefficient of determination (R^2).
+%direct indirect effects  fehlt noch
+
+The final part of the assessment concerns the structural model.
+First, the path coefficients are inspected with respect to sign, magnitude, and significance, where the inference is based on resample methods, such as bootstrap. 
+Second, the contribution of each predictor is quantified by the effect size $f^2$.
+Third, the explained variance of the endogenous constructs is summarized by $R^2$ and its adjusted version.
 
 <<paths-boot>>=
 # Path coefficient estimates incl. bootstrap std. errors, t-values and p-values
 summarize(res_csem)$Estimates$Path_estimates
 @
 
-% TODO (Jason): text — effect sizes f^2: change in R^2 when a predictor is omitted.
-% (No benchmarks — describe what can be done.)
+
+To judge the relevance of each individual path, the effect size $f^2$ can beconsulted. 
+It measures the increase in unexplained variance that results from dropping a predictor, relative to the unexplained variance of the full model, and thereby isolates each predictor's contribution.
 
 <<effect-sizes>>=
 # Effect sizes (f^2)
 quality$F2
 @
 
-% TODO (Jason): text — explained variance: R^2 and adjusted R^2 of the endogenous
-% constructs (JS, OC, SI).
+
+As a last step, the explained variance of the endogenous constructs is examined.
+For each of \glqq JS\grqq, \glqq OC\grqq, and \glqq SI\grqq, $R^2$ gives the proportion of variance accounted for by the structural equation; the adjusted $R^2$ penalizes for the number of predictors and thus allows a fairer comparison across equations of different size.
 
 <<r-squared>>=
 # Coefficient of determination (R^2) and adjusted R^2
