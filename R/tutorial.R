@@ -56,7 +56,9 @@ model <- "
   OC ~ EP + AC + JS
   SI ~ JS + OC
 "
-
+library(lavaan)
+res_lav <- lavaan::sem(model = model, data = HBAT_SEM_rel)
+summary(res_lav, fit.measures = TRUE, standardized = TRUE)
 # --- 2.4 Model estimation -----------------------------------------------------
 
 ## ---- csem-est ----
@@ -82,11 +84,18 @@ verify(res_csem)
 
 ## ---- test-omf ----
 # Bootstrap-based test of the overall model fit
-fit_test <- testOMF(
+fit_test_replace <- testOMF(
   res_csem,
-  .R                    = 1000,
+  .R                    = 400,
   .seed                 = 42,
   .handle_inadmissibles = "replace"
+)
+
+fit_test <- testOMF(
+  res_csem,
+  .R                    = 400,
+  .seed                 = 42,
+  .handle_inadmissibles = "drop"
 )
 
 fit_test

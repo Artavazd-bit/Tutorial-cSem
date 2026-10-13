@@ -307,7 +307,7 @@ dim(HBAT_SEM_rel)
 Since two observations contain missing values, all analyses in the remainder of this tutorial are based on the $N = 398$ complete observations.
 When using their own data, users must ensure it is stored as a data frame or a matrix before passing it to \pkg{cSEM} functions; if necessary, the data can be converted with \fn{as.data.frame()} or \fn{as.matrix()}.
 
-\subsection{Model specification}
+\subsection{Model Specification}
 In \pkg{cSEM}, models are specified using the \pkg{lavaan} model syntax.
 The \pkg{lavaan} package does not need to be installed to use the syntax. 
 In particular, the \code{=\textasciitilde} and the \code{<\textasciitilde} operators are used to define the relations between the constructs and their indicators.
@@ -332,7 +332,7 @@ model <- "
 "
 @
 
-\subsection{Model estimation}
+\subsection{Model Estimation}
 \label{sec:estimation}
 
 The central function is \fn{csem()}.
@@ -378,23 +378,22 @@ Next, the model estimates are assessed, according to the guidelines described in
 This assessment comprises three parts: 
 The assessment of the overall model fit, the assessment of the reflective measurement models, and the evaluation of the structural model.
 
-\subsection{Overall model fit}
+\subsection{Overall Model Fit}
 \label{sec:overall-fit}
-
 Before the overall model fit can be tested, the estimation needs to be validated. 
 This is done with the \fn{verify()} function. 
 This function gives the user details about the estimation. 
 It gives information if convergence is achieved, all absolute standardized loading 
-estimates are smaller or equal than one.
-It also checks whether the construct variance covariance matrix is positive semi-definite, if all reliability estimates are smaller or equal than one and if the model-implied indicator variance covariance matrix is positive semi-definite.
+estimates are less than or equal to one.
+It also checks whether the construct variance covariance matrix is positive semi-definite, if all reliability estimates are less than or equal to one and if the model-implied indicator variance covariance matrix is positive semi-definite.
 If a check fails, the results should not be interpreted and the user needs to customize the algorithm to ensure a valid estimation process.
-For that check Section \ref{sec:customization}.
+For that see Section \ref{sec:customization}.
 <<verify>>=
 # Check whether the estimation is admissible
 verify(res_csem)
 @
 
-After that the overall model fit with the function \fn{testOMF()} can be examined.. 
+After that the overall model fit with the function \fn{testOMF()} can be examined.
 The function \fn{testOMF()} is a bootstrap-based test for model fit originally proposed by \citet{Beran1985}.
 See also \citet{Dijkstra2015} who first suggested the test in the context of PLS-PM.
 By default \fn{testOMF()} tests the null hypothesis that the population indicator correlation matrix equals the population model-implied indicator correlation matrix. 
@@ -409,18 +408,19 @@ fit_test <- testOMF(
   .seed                 = 42,
   .handle_inadmissibles = "replace"
 )
-
 fit_test
 @
 
-\subsection{Assessment of the reflective measurement models}
+\subsection{Assessment of the Reflective Measurement Models}
 \label{sec:measurement}
-The next step is about assessing the reflective measurement models. 
-The assessment follows the guideline described in \citet{Benitez2020}. 
-It includes reliability, indicator reliability, convergent validity, and discriminant validity. 
-The \fn{assess()} function computes all relevant quality criteria.
+The next step is about assessing the reflective measurement models.
+%The assessment follows the guideline described in \citet{Benitez2020}. 
+It includes construct reliability, indicator reliability, convergent validity, and discriminant validity.
+The \fn{assess()} function computes all relevant assessment criteria.
 The output shows all criteria grouped in titled sections. 
-The output here is shortened for presentation, the "\dots" mark omitted lines, running the code yields the full report.
+The output here is shortened for presentation.
+The "\dots" mark omitted lines.
+Running the code gives the full report.
 
 <<assess-quality, excerpt.lines = 5, warning = FALSE>>=
 #Compute all quality criteria
@@ -428,64 +428,29 @@ quality <- assess(res_csem)
 quality
 @
 
-In the following, the criteria of \fn{assess()} are extracted one at a time.
+In the following, the criteria of \fn{assess()} are extracted and explained one at a time.
 
-\subsubsection*{Evaluating the reliability of the construct scores}
+\subsubsection*{Evaluating Construct Reliability}
 \label{sec:reliability}
-
-%\subsection*{Evaluating the weights}
-% braucht man das wirklich???
-
-
-% TODO (Jason): pick ONE option below, uncomment it, delete the others.
-% (Note: significance of the loadings is already covered in the indicator reliability
-% step; option C addresses whether this subsection is needed at all for Mode A.)
-%
-% --- OPTION A (procedural) ---
-% Besides the reliability coefficients, the weight estimates themselves can be
-% inspected. The \fn{summarize()} function returns the weight estimates together
-% with their bootstrap standard errors, t-values, and p-values, which allows the
-% user to judge the sign, magnitude, and significance of each weight.
-%
-% --- OPTION B (rationale-first) ---
-% The weights determine how the indicators are combined into the construct scores
-% and therefore deserve inspection in their own right. Since the estimation in
-% Section \ref{sec:estimation} already included a bootstrap run, \fn{summarize()}
-% directly reports standard errors, t-values, and p-values for each weight estimate.
-%
-% --- OPTION C (minimal, with pointer) ---
-% For completeness, the weight estimates and their bootstrap-based inference can be
-% extracted via \fn{summarize()}. Note that for purely reflective measurement
-% models, as in the present example, the assessment typically focuses on the
-% loadings; the weights are primarily of interest for composite (Mode B) measurement.
-
-<<weights-boot>>=
-# Weight estimates incl. bootstrap std. errors, t-values and p-values
-summarize(res_csem)$Estimates$Weight_estimates
-@
-
-
-
 
 In this step we evaluate whether the items reliably represent the underlying construct.
 A construct with high reliability tends to produce similar items under consistent conditions \citet{Reliability}.
 The \pkg{cSEM} package offers a variety of different reliability coefficients.
-These include Cronbach's $\alpha$ \citet{Cronbach}, Jöreskog's congeneric reliability $\rho_C$ \citet{Joereskog}, and Dijkstra--Henseler's $\rho_A$ \citet{Dijkstra}.
-These coeffificents differ in their assumption imposed on the measurment models.
+These include Cronbach's $\alpha$ \citet{Cronbach}, J{\"o}reskog's congeneric reliability $\rho_C$ \citet{Joereskog}, and Dijkstra--Henseler's $\rho_A$ \citet{Dijkstra}.
+These coefficients differ in their assumption imposed on the measurement models.
 Cronbach's $\alpha$ assumes equal weights and tau-equivalent items, i.e., equal population loadings across indicators \citet{}.
-Jöreskog's $\rho_C$ allows loadings to differ across indicators but still assumes unit weights when forming the construct scores \citet{}.
+J{\"o}reskog's $\rho_C$ allows loadings to differ across indicators but still assumes unit weights when forming the construct scores \citet{}.
 Dijkstra--Henseler's $\rho_A$ relaxes both, as it is based on the estimated weights, and thus matches how the construct scores were actually computed \citet{}.
 
-
-We can extract the information for the reliability assessment out of the assess object with the $\mathdollar$ operator: 
+We can extract the information for the reliability assessment out of the assess object with the \code{\$} operator: 
 <<assess-rho-A>>=
-#Show Dijkstras and Henselers rho A
+# Show reliability criteria
 quality$Reliability
 @
 
-Additionnaly the \fn{assess()} function offers alternative reliability coefficients. 
+Additionally the \fn{assess()} function offers alternative reliability coefficients. 
 <<assess-rho_C>>=
-# Show rho_C
+# Show alternative reliability coefficients.
 quality$RhoC
 quality$RhoC_mm
 quality$RhoC_weighted
@@ -493,23 +458,23 @@ quality$RhoC_weighted_mm
 @  
 
 
-\subsubsection*{Evaluating indicator reliability}
-While the reliability of the construct scores summarizes the measurement quality of each ocnstruct as a whole, indicator reliability examines the contribution of each individual indicator. 
-Indicator reliability encapsulates how much variance can be explained by the underlying construct.
+\subsubsection*{Evaluating Indicator Reliability}
+While the reliability of the construct scores summarizes the measurement quality of each construct as a whole, indicator reliability examines the contribution of each individual indicator. 
+Indicator reliability assesses how much variance can be explained by the underlying construct.
 It can be assessed via the factor loadings, since the squared standardized loading equals the proportion of indicator variance attributable to the construct.
-For that we extract out of the \fn{csem} object res_csem the loadings, its standard errors, and its corresponding confidence intervals.
- To also judge the precision and significance of the loading estimates, standard errors and confidence intervals are needed, which in PLS-PM are obtained by resampling. 
-This is why the bootstrap was already requested in the \fn{csem()} call in Section \ref{sec:estimation}.
+For that we extract out of the \fn{csem()} object, \code{res\_csem}, the loadings, its standard errors, and its corresponding confidence intervals.
+To also judge the precision and significance of the loading estimates, standard errors and confidence intervals are needed, which in PLS-PM are obtained by resampling. 
+This is why bootstrap was already requested in the \fn{csem()} call in Section \ref{sec:estimation}.
 
 <<loadings-boot>>=
 # Loading estimates incl. bootstrap std. errors, t-values and p-values
 summarize(res_csem)$Estimates$Loading_estimates
 @
 
-\subsubsection*{Evaluating convergent validity}
-Convergent validity is the extent to which the indicators belong to one latent variable actually measure the same construct.
-In the \pkg{cSEM} package this is done with the average variance extracted (AVE) \citet{}.
-The AVE summarizes, per construct, how much of the indicators' variance is captured by the construct rather than by measurement. 
+\subsubsection*{Evaluating Convergent Validity}
+Convergent validity is the extent to which the indicators belonging to one latent variable actually measure the same construct \citet{}.
+In the \pkg{cSEM} package this is done with the average variance extracted (AVE) \citet{AVE}.
+The AVE summarizes, per construct, how much of the indicators' variance is captured by the construct rather than by measurement error \citet{}. 
 It thus aggregates the indicator reliabilities from the previous step to the construct level.
 
 <<ave>>=
@@ -517,16 +482,19 @@ It thus aggregates the indicator reliabilities from the previous step to the con
 quality$AVE
 @
 
-\subsubsection*{Evaluating discriminant validity}
-Discriminant validity is the extent to which the latent variables are enough to distinct of each other so it makes sense to model them as distinct variables.
-The \pkg{cSEM} package uses the HTMT and its improved version HTMT2 to assess discriminant validity.
+\subsubsection*{Evaluating Discriminant Validity}
+Discriminant validity refers to the extent to which latent variables are sufficiently distinct from one another to model them as distinct constructs.
+The \pkg{cSEM} package assesses discriminant validity using the HTMT and its improved version, the HTMT2.
 Both are calculated with the default options within the \fn{assess()} function.
-If the user wants to do inference the \prm{.inference} parameter can be set to "bootstrap" or "asymptotic" then the associated confidence intervals are being calculated.
-While doing inference it is recommended to set \prm{.absolute} to FALSE. 
-If one is bigger than the upper limit then discriminant validity is seen as established.
+To conduct inference, the \prm{.inference} argument can be set to \code{"bootstrap"} or \code{"asymptotic"}, in which case the corresponding confidence intervals are also computed.
+When performing inference, it is recommended to set \prm{.absolute} to \code{FALSE}.
+%Discriminant validity is considered established if the upper limit of the confidence interval lies below the chosen threshold.
 
 <<htmt, warning = TRUE>>=
-# Heterotrait-monotrait ratio of correlations (HTMT)
+# Heterotrait-monotrait ratio of correlations (HTMT) 
+quality$HTMT
+
+# Heterotrait-monotrait ratio of correlations (HTMT) with inference
 HTMT <- assess(res_csem, 
                .quality_criterion = "htmt", 
                .inference = "asymptotic", 
@@ -539,7 +507,10 @@ This does not lead to any calculation issues.
 
 The improved version HTMT2 and its inference can be calculated via bootstrap confidence intervals. 
 <<htmt2, warning = FALSE>>=
-# Heterotrai-monotrait ratio 2 of correlations (HTMT2)
+# Heterotrait-monotrait ratio 2 of correlations (HTMT2)
+quality$HTMT2
+
+# Heterotrait-monotrait ratio 2 of correlations (HTMT2) with inference
 HTMT2 <- assess(res_csem,
                 .quality_criterion = "htmt2",
                 .inference = "bootstrap",
@@ -549,7 +520,7 @@ HTMT2
 @
 
 
-\subsection{Structural model evaluation}
+\subsection{Structural Model Evaluation}
 \label{sec:structural}
 
 %direct indirect effects  fehlt noch
@@ -565,7 +536,7 @@ summarize(res_csem)$Estimates$Path_estimates
 @
 
 
-To judge the relevance of each individual path, the effect size $f^2$ can beconsulted. 
+To judge the relevance of each individual path, the effect size $f^2$ can be consulted. 
 It measures the increase in unexplained variance that results from dropping a predictor, relative to the unexplained variance of the full model, and thereby isolates each predictor's contribution.
 
 <<effect-sizes>>=
@@ -588,8 +559,106 @@ quality$R2_adj
 \label{sec:further}
 \subsection{Customization of PLS-PM}
 \label{sec:customization}
-\subsection{predictive model assessment}
-\subsection{non linear}
+
+% TODO (Jason): lead-in. csem() runs with defaults (PLSc for common factors,
+% path weighting scheme, Pearson correlations, convergence tolerance + iteration
+% cap). All of them are arguments of csem(). Link back to Section
+% \ref{sec:overall-fit}: a failed verify() check is the typical reason to change
+% one of them. Four dials follow: weighting scheme/convergence, PLSc vs.
+% traditional PLS-PM, robust correlations, resampling options.
+
+\subsubsection*{Inner Weighting Scheme and Convergence}
+
+% TODO (Jason): the PLS algorithm iterates between inner and outer weights
+% until the change falls below \prm{.tolerance} or \prm{.iter\_max} iterations
+% are reached. If verify() check 1 (convergence) fails: raise \prm{.iter\_max},
+% loosen \prm{.tolerance}, or switch \prm{.PLS\_weight\_scheme\_inner} from the
+% default "path" to "centroid" or "factorial". The chunk below re-estimates
+% with the centroid scheme; path estimates barely move (verified 2026-10-13).
+
+<<custom-weighting>>=
+# Re-estimate with the centroid inner weighting scheme
+res_centroid <- csem(
+  .data                    = HBAT_SEM_rel,
+  .model                   = model,
+  .PLS_weight_scheme_inner = "centroid"
+)
+res_centroid$Estimates$Path_estimates
+@
+
+% Optional (decision open): a deliberately failing convergence check, so the
+% reader sees what a "not ok" in verify() looks like. Uncomment if wanted.
+%<<custom-nonconvergence>>=
+%# Force non-convergence by capping the iterations
+%res_cap <- csem(.data = HBAT_SEM_rel, .model = model, .iter_max = 2)
+%verify(res_cap)
+%@
+
+\subsubsection*{PLSc versus Traditional PLS-PM}
+
+% TODO (Jason): by default csem() applies the PLSc correction for attenuation
+% to all constructs specified as common factors (=~). \prm{.disattenuate} =
+% FALSE gives the traditional PLS-PM estimates (what SmartPLS reports as
+% PLS-SEM). On this data the correction matters: EP -> OC 0.38 vs. 0.43,
+% OC -> SI 0.44 vs. 0.49 (verified 2026-10-13). Keep it short here; the full
+% comparison with CB-SEM is Section 4.
+
+<<custom-disattenuate>>=
+# Traditional PLS-PM: no correction for attenuation
+res_pls <- csem(
+  .data         = HBAT_SEM_rel,
+  .model        = model,
+  .disattenuate = FALSE
+)
+res_pls$Estimates$Path_estimates
+@
+
+\subsubsection*{Robust Correlations}
+
+% TODO (Jason): all PLS-PM estimates are functions of the indicator
+% correlation matrix. For ordinal or heavy-tailed data,
+% \prm{.approach\_cor\_robust} = "spearman" replaces the Pearson matrix with
+% Spearman rank correlations. Effect on this data is large (EP -> OC 0.43 vs.
+% 0.61, verified 2026-10-13) -- worth a sentence of caution that the choice
+% should follow the data, not the preferred result.
+
+<<custom-robust>>=
+# Spearman rank correlations instead of Pearson correlations
+res_spearman <- csem(
+  .data               = HBAT_SEM_rel,
+  .model              = model,
+  .approach_cor_robust = "spearman"
+)
+res_spearman$Estimates$Path_estimates
+@
+
+\subsubsection*{Resampling Options}
+
+% TODO (Jason): the bootstrap from Section \ref{sec:estimation} has dials too:
+% \prm{.handle\_inadmissibles} controls what happens with resamples that fail
+% the admissibility checks ("drop" (default), "ignore", "replace") -- already
+% used for testOMF() in Section \ref{sec:overall-fit};
+% \prm{.sign\_change\_option} addresses sign indeterminacy of the weights
+% across resamples ("none" (default), "individual", "individual_reestimate",
+% "construct_reestimate"). Text only, or uncomment the chunk.
+
+%<<custom-resampling>>=
+%# Bootstrap with replacement of inadmissible resamples and sign correction
+%res_boot2 <- csem(
+%  .data                 = HBAT_SEM_rel,
+%  .model                = model,
+%  .resample_method      = "bootstrap",
+%  .R                    = 1000,
+%  .seed                 = 42,
+%  .handle_inadmissibles = "replace",
+%  .sign_change_option   = "individual"
+%)
+%summarize(res_boot2)$Estimates$Path_estimates
+%@
+
+\subsection{predictive model assessment} elephant in the room, 
+\subsection{non linear} Dijkstra and schermelleh-engel, 2014, psychometrika
+\subsection{MGA} Kleese et al 2021, Sarstedt et al 2019, 
 
 \section{Concluding remarks}
 \label{sec:discussion}
