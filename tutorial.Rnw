@@ -558,23 +558,85 @@ quality$R2_adj
 \section{Further features of \texorpdfstring{\pkg{cSEM}}{cSEM}}
 \label{sec:further}
 \subsection{Customization of PLS-PM}
+
+<<custom-overview>>=
+# All PLS-PM arguments of csem() at their defaults
+res_default <- csem(
+  .data                        = HBAT_SEM_rel,
+  .model                       = model,
+  # Weight estimation: outer and inner weights
+  .PLS_modes                   = NULL,              # "modeA", "modeB", ...
+  .PLS_weight_scheme_inner     = "path",            # "centroid", "factorial"
+  .PLS_ignore_structural_model = FALSE,
+  .starting_values             = NULL,
+  .dominant_indicators         = NULL,
+  # Weight estimation: convergence
+  .conv_criterion              = "diff_absolute",   # "diff_squared", "diff_relative"
+  .tolerance                   = 1e-05,
+  .iter_max                    = 100,
+  # Correction for attenuation (PLSc)
+  .disattenuate                = TRUE,
+  .PLS_approach_cf             = "dist_squared_euclid",
+  .reliabilities               = NULL,
+  # Structural model
+  .approach_paths              = "OLS",             # "2SLS"
+  .approach_nl                 = "sequential",      # "replace"
+  .normality                   = FALSE,
+  .id                          = NULL
+)
+@
 \label{sec:customization}
 
-% TODO (Jason): lead-in. csem() runs with defaults (PLSc for common factors,
-% path weighting scheme, Pearson correlations, convergence tolerance + iteration
-% cap). All of them are arguments of csem(). Link back to Section
-% \ref{sec:overall-fit}: a failed verify() check is the typical reason to change
-% one of them. Four dials follow: weighting scheme/convergence, PLSc vs.
-% traditional PLS-PM, robust correlations, resampling options.
+% TODO (Jason): lead-in. csem() runs with defaults; every default is an
+% argument of csem(). Link back to Section \ref{sec:overall-fit}: a failed
+% verify() check is the typical reason to change one of them. The arguments
+% are grouped in the order in which csem() uses them: (1) outer and inner
+% weights, (2) convergence of the iteration, (3) correction for attenuation,
+% (4) estimation of the structural model. Each block opens with a chunk that
+% shows its arguments at their defaults (all four reproduce res_csem without
+% bootstrap, verified 2026-10-14), followed by one example that changes a
+% default.
 
-\subsubsection*{Inner Weighting Scheme and Convergence}
+The function \fn{csem()} has a lot of input arguments.
+These input arguments shape the PLS argument in four different dimensions. 
+First the outer and inner weights. 
+Second, the convergence of the algorithm.
+Third, the correction for attenuation.
+Fourth, the estimation of the strutural model.
+All of these input arguments have default options, which should be best for most cases. 
+A failed \fn{verify()} check is a reason to adapt the algorithm.
+In the following most input parameters are presented with their default options, followed by one example that changes a default. 
 
-% TODO (Jason): the PLS algorithm iterates between inner and outer weights
-% until the change falls below \prm{.tolerance} or \prm{.iter\_max} iterations
-% are reached. If verify() check 1 (convergence) fails: raise \prm{.iter\_max},
-% loosen \prm{.tolerance}, or switch \prm{.PLS\_weight\_scheme\_inner} from the
-% default "path" to "centroid" or "factorial". The chunk below re-estimates
-% with the centroid scheme; path estimates barely move (verified 2026-10-13).
+\subsubsection*{Outer and Inner Weights}
+
+% TODO (Jason): how the composites are formed. \prm{.PLS\_modes} sets the
+% outer mode per construct (default NULL = Mode A for common factors, Mode B
+% for composites); \prm{.PLS\_weight\_scheme\_inner} the inner scheme;
+% \prm{.PLS\_ignore\_structural\_model} = TRUE drops the structural model
+% from the inner weighting; \prm{.starting\_values} replaces the default
+% starting weights; \prm{.dominant\_indicators} fixes the sign of the weights
+% so that each construct correlates positively with its dominant indicator.
+% Mode B via .PLS_modes deliberately not shown: on this model it yields
+% reliabilities > 1 and verify() flags it (TODO.md).
+
+
+
+<<custom-weights-default>>=
+# Weight estimation: arguments at their defaults
+res_weights <- csem(
+  .data                        = HBAT_SEM_rel,
+  .model                       = model,
+  .PLS_modes                   = NULL,     # "modeA", "modeB", "modeBNNLS",
+                                           # "unit", "PCA" or fixed weights
+  .PLS_weight_scheme_inner     = "path",   # "centroid", "factorial"
+  .PLS_ignore_structural_model = FALSE,
+  .starting_values             = NULL,
+  .dominant_indicators         = NULL
+)
+@
+
+% TODO (Jason): example. Switch to the centroid scheme; path estimates barely
+% move (verified 2026-10-13).
 
 <<custom-weighting>>=
 # Re-estimate with the centroid inner weighting scheme
@@ -586,19 +648,65 @@ res_centroid <- csem(
 res_centroid$Estimates$Path_estimates
 @
 
-% Optional (decision open): a deliberately failing convergence check, so the
-% reader sees what a "not ok" in verify() looks like. Uncomment if wanted.
-%<<custom-nonconvergence>>=
-%# Force non-convergence by capping the iterations
-%res_cap <- csem(.data = HBAT_SEM_rel, .model = model, .iter_max = 2)
-%verify(res_cap)
-%@
+\subsubsection*{Convergence}
 
-\subsubsection*{PLSc versus Traditional PLS-PM}
+% TODO (Jason): the algorithm iterates between inner and outer weights until
+% the change in the weights, measured by \prm{.conv\_criterion}, falls below
+% \prm{.tolerance} or \prm{.iter\_max} iterations are reached. If verify()
+% check 1 fails: raise \prm{.iter\_max}, loosen \prm{.tolerance}, or change
+% the weighting scheme (previous block). \prm{.iter\_max} = 1 returns
+% one-step weights.
+
+<<custom-convergence-default>>=
+# Convergence: arguments at their defaults
+res_conv <- csem(
+  .data           = HBAT_SEM_rel,
+  .model          = model,
+  .conv_criterion = "diff_absolute",   # "diff_squared", "diff_relative"
+  .tolerance      = 1e-05,
+  .iter_max       = 100
+)
+@
+
+% TODO (Jason): example. Capping the iterations at two forces a failed
+% convergence check, so the reader sees what "not ok" in verify() looks like
+% (verified 2026-10-14: check 1 not ok, checks 2-5 ok).
+
+<<custom-nonconvergence>>=
+# Force non-convergence by capping the iterations
+res_cap <- csem(
+  .data     = HBAT_SEM_rel,
+  .model    = model,
+  .iter_max = 2
+)
+verify(res_cap)
+@
+
+\subsubsection*{Correction for Attenuation (PLSc)}
 
 % TODO (Jason): by default csem() applies the PLSc correction for attenuation
-% to all constructs specified as common factors (=~). \prm{.disattenuate} =
-% FALSE gives the traditional PLS-PM estimates (what SmartPLS reports as
+% to all constructs specified as common factors (=~). \prm{.PLS\_approach\_cf}
+% selects how the correction factors are obtained; the seven options are
+% "dist_squared_euclid" (default), "dist_euclid_weighted",
+% "fisher_transformed", "mean_arithmetic", "mean_geometric",
+% "mean_harmonic", "geo_of_harmonic" (too many for a code comment, list them
+% in the prose). \prm{.reliabilities} lets the user supply known
+% reliabilities ("construct" = value) for some or all constructs instead of
+% estimating them.
+
+<<custom-plsc-default>>=
+# Correction for attenuation: arguments at their defaults
+res_plsc <- csem(
+  .data            = HBAT_SEM_rel,
+  .model           = model,
+  .disattenuate    = TRUE,
+  .PLS_approach_cf = "dist_squared_euclid",
+  .reliabilities   = NULL                  # e.g. c("AC" = 0.85)
+)
+@
+
+% TODO (Jason): example. \prm{.disattenuate} = FALSE switches the correction
+% off and gives the traditional PLS-PM estimates (what SmartPLS reports as
 % PLS-SEM). On this data the correction matters: EP -> OC 0.38 vs. 0.43,
 % OC -> SI 0.44 vs. 0.49 (verified 2026-10-13). Keep it short here; the full
 % comparison with CB-SEM is Section 4.
@@ -613,48 +721,28 @@ res_pls <- csem(
 res_pls$Estimates$Path_estimates
 @
 
-\subsubsection*{Robust Correlations}
+\subsubsection*{Structural Model}
 
-% TODO (Jason): all PLS-PM estimates are functions of the indicator
-% correlation matrix. For ordinal or heavy-tailed data,
-% \prm{.approach\_cor\_robust} = "spearman" replaces the Pearson matrix with
-% Spearman rank correlations. Effect on this data is large (EP -> OC 0.43 vs.
-% 0.61, verified 2026-10-13) -- worth a sentence of caution that the choice
-% should follow the data, not the preferred result.
+% TODO (Jason): once the weights are fixed, the structural coefficients are
+% estimated. \prm{.approach\_paths}: OLS by default, "2SLS" requires
+% instruments via \prm{.instruments}. \prm{.approach\_nl} and
+% \prm{.normality} only matter for nonlinear models (ignored otherwise) --
+% one sentence each plus a forward reference to Section 5.3. \prm{.id} names
+% the column that splits the data into groups -- one sentence plus a forward
+% reference to Section 5.4 (MGA). No example chunk in this block: 2SLS needs
+% instruments the model does not have, the other three belong to 5.3/5.4.
 
-<<custom-robust>>=
-# Spearman rank correlations instead of Pearson correlations
-res_spearman <- csem(
-  .data               = HBAT_SEM_rel,
-  .model              = model,
-  .approach_cor_robust = "spearman"
+<<custom-structural-default>>=
+# Structural model: arguments at their defaults
+res_struct <- csem(
+  .data           = HBAT_SEM_rel,
+  .model          = model,
+  .approach_paths = "OLS",          # "2SLS" (needs .instruments)
+  .approach_nl    = "sequential",   # "replace"; nonlinear models only
+  .normality      = FALSE,          # nonlinear models only
+  .id             = NULL            # grouping variable, see Section 5.4
 )
-res_spearman$Estimates$Path_estimates
 @
-
-\subsubsection*{Resampling Options}
-
-% TODO (Jason): the bootstrap from Section \ref{sec:estimation} has dials too:
-% \prm{.handle\_inadmissibles} controls what happens with resamples that fail
-% the admissibility checks ("drop" (default), "ignore", "replace") -- already
-% used for testOMF() in Section \ref{sec:overall-fit};
-% \prm{.sign\_change\_option} addresses sign indeterminacy of the weights
-% across resamples ("none" (default), "individual", "individual_reestimate",
-% "construct_reestimate"). Text only, or uncomment the chunk.
-
-%<<custom-resampling>>=
-%# Bootstrap with replacement of inadmissible resamples and sign correction
-%res_boot2 <- csem(
-%  .data                 = HBAT_SEM_rel,
-%  .model                = model,
-%  .resample_method      = "bootstrap",
-%  .R                    = 1000,
-%  .seed                 = 42,
-%  .handle_inadmissibles = "replace",
-%  .sign_change_option   = "individual"
-%)
-%summarize(res_boot2)$Estimates$Path_estimates
-%@
 
 \subsection{predictive model assessment} elephant in the room, 
 \subsection{non linear} Dijkstra and schermelleh-engel, 2014, psychometrika
